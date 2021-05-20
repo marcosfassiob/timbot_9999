@@ -1,0 +1,35 @@
+{
+    "invite_link": "https://discord.com/oauth2/authorize?client_id=805978843516502026&scope=bot&permissions=8",
+
+    "textChannels":
+    [
+        "general",
+        "lounge", 
+        "main",
+        "chat", 
+        "talk", 
+        "lobby"
+    ],
+
+    "categories":
+    [
+        "log",
+        "logging",
+        "admin",
+        "staff"
+    ],
+
+    "adminPerms":
+    [
+        "ADMINISTRATOR",
+        "KICK_MEMBERS",
+        "BAN_MEMBERS",
+        "MANAGE_CHANNELS",
+        "MANAGE_GUILD",
+        "VIEW_AUDIT_LOG",
+        "MANAGE_MESSAGES",
+        "MANAGE_NICKNAMES",
+        "MANAGE_ROLES",
+        "MANAGE_WEBHOOKS"
+    ]
+}
