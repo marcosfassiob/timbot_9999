@@ -9,8 +9,7 @@ module.exports = {
         'cmds'
     ],
     usage: [
-        `${process.env.PREFIX}help`, 
-        `${process.env.PREFIX}help [command]`
+        `${process.env.PREFIX}help [command]`, 
     ],
     perms: "None",
     desc: 'Displays a list of commands',
@@ -21,7 +20,9 @@ module.exports = {
         const mod_commands = client.commands_mod.map(c => `\`${c.name}\``).join(' ');
         const misc_commands = client.commands_misc.map(c => `\`${c.name}\``).join(' ');
         const config_commands = client.commands_config.map(c => `\`${c.name}\``).join(' ');
+
         const loadedPrefix = await guildConfigSchema.findOne({ guildId: message.guild.id }, 'prefix');
+        const { prefix } = loadedPrefix;
 
         function help() {
             const embed1 = new Discord.MessageEmbed()
@@ -40,9 +41,9 @@ module.exports = {
         }
 
         function helpPrompt() {
-            const cmd = client.commands.get(message.content.slice(loadedPrefix.prefix.length).toLowerCase())
+            const cmd = client.commands.get(message.content.slice(prefix.length).toLowerCase())
             || client.commands.get(args[0])
-            || client.commands.find(a => a.aliases && a.aliases.includes(args[0] || message.content.slice(loadedPrefix.prefix.length)))
+            || client.commands.find(a => a.aliases && a.aliases.includes(args[0] || message.content.slice(prefix.length)))
             const command = client.commands.get(cmd.name, cmd)
             let color;
 
@@ -81,8 +82,8 @@ module.exports = {
             message.channel.send(embed5)
         }
         
-        if (!args[0] && message.content.startsWith(`${loadedPrefix.prefix}help`)) help()
-        else if (!message.content.startsWith(`${loadedPrefix.prefix}help`)) helpPrompt()
+        if (!args[0] && message.content.startsWith(`${loadedPrefix.prefix}help`) || message.content === `${prefix}`) help()
+        else if (!message.content.startsWith(`${prefix}help`)) helpPrompt()
         else if (!client.commands.has(args[0]) && !client.commands.find(a => a.aliases && a.aliases.includes(args[0].toLowerCase()))) {
             return message.reply(`\`${args.join(' ')}\` is not a valid command.`)
         } else helpPrompt()

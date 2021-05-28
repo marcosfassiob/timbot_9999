@@ -70,7 +70,7 @@ module.exports = (client, Discord, dayjs) => {
                     member.kick()
                         .catch(err => {
                             console.log(err)
-                            message.channel.send(`Something happened. Please use \`t.report\` to report this bug!\n` + "```\n" + err + "```\n")
+                            message.channel.send(`Something stopped working. Please use \`t.report\` to report this bug!\n` + "```\n" + err + "```\n")
                         })
                 });
             }

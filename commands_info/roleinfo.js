@@ -14,18 +14,15 @@ module.exports = {
     aliases: 'roleinfo',
     perms: "None",
     execute(client, message, args, Discord) {
+        
+        let members = []
 
         let role = message.guild.roles.cache.find(r => r.name.toLowerCase().includes(args.join(' ')))
         || message.guild.roles.cache.get(args[0])  
         || message.mentions.roles.first() 
-
-        console.log(role)
-        console.log(args.join(' '))
         if (role === undefined) return message.reply('I couldn\'t find that role.')
 
-        let members = []
-
-        function getRoleInfo() {
+        const getRoleInfo = () => {
             members = role.members.map(m => m.user.tag)
             switch (true) {
                 case (members.toString().length > 1000):
@@ -51,6 +48,6 @@ module.exports = {
         );
         
         message.channel.send(embed)
-            .catch(e => console.log(e));
+            .catch(err => console.log(err));
     }
 }

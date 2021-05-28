@@ -59,9 +59,29 @@ module.exports = (client) => {
             try {
                 if (message.guild.id === '778461267999588363') {
                     const result = await levelSchema.findOne({ guildId: guild.id, userId: member.id }, 'level xp -_id');
+                    if (result === null) return;
                     console.log(result)
                     const { level } = result;
-    
+                    if (level >= 15) {
+                        guild.members.fetch(member.id).then(member => {
+                            member.roles.add('847730964619591701');
+                        })
+                    } else if (level <= 15) {
+                        guild.members.fetch(member.id).then(member => {
+                            member.roles.remove('847730964619591701');
+                        })
+                    }
+                    
+                    if (level >= 10) {
+                        guild.members.fetch(member.id).then(member => {
+                            member.roles.add('847730653466460160');
+                        })
+                    } else if (level <= 10) {
+                        guild.members.fetch(member.id).then(member => {
+                            member.roles.remove('847730653466460160');
+                        })
+                    }
+
                     if (level >= 5) {
                         guild.members.fetch(member.id).then(member => {
                             member.roles.add('778478893451182140');

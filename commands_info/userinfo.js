@@ -7,7 +7,6 @@ module.exports = {
         'whois'
     ],
     usage: [
-        `${process.env.PREFIX}userinfo`, 
         `${process.env.PREFIX}userinfo [@user]`
     ],
     example: [

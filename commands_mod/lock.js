@@ -10,7 +10,6 @@ module.exports = {
 
     ],
     example: [
-        `${process.env.PREFIX}lock`,
         `${process.env.PREFIX}lock 5m raid`,
         `${process.env.PREFIX}lock all`
     ],

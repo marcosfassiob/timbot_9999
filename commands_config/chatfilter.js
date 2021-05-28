@@ -82,6 +82,7 @@ module.exports = {
                 const embed = new Discord.MessageEmbed()
                 .setColor("642667")
                 .setTitle(`Removed phrase "${arguments}" from server's chat filter.`)
+                .setTimestamp()
                 
                 const embed2 = new Discord.MessageEmbed()
                 .setColor("642667")
@@ -151,6 +152,7 @@ module.exports = {
                     const embed = new Discord.MessageEmbed()
                     .setColor("642667")
                     .setTitle(`Reset chat filter settings to default.`)
+                    .setTimestamp()
 
                     const embed2 = new Discord.MessageEmbed()
                     .setColor("642667")
@@ -162,6 +164,42 @@ module.exports = {
                     console.log(err)
                 } finally {
                     mongoose.connection.close();
+                }
+            })
+        }
+
+        const enableOrDisable = async word => {
+            await mongoose.connect(process.env.MONGO_URI, {
+                useNewUrlParser: true,
+                useFindAndModify: false,
+                useUnifiedTopology: true
+            }).then(async () => {
+                try {
+                    if (word === 'enable') {
+                        await guildConfigSchema.findOneAndUpdate( 
+                            { guildId: message.guild.id }, 
+                            { $set: { enableChatFilter: true } },
+                        )   
+                    } else if (word === 'disable') {
+                        await guildConfigSchema.findOneAndUpdate( 
+                            { guildId: message.guild.id }, 
+                            { $set: { enableChatFilter: false } },
+                        )
+                    } 
+                    const embed = new Discord.MessageEmbed()
+                    .setColor("642667")
+                    .setTitle(`${(word === 'enable') ? 'Enabled' : 'Disabled'} chat filter.`)
+                    .setTimestamp();
+                    message.channel.send(embed)
+
+                    const embed2 = new Discord.MessageEmbed()
+                    .setColor("642667")
+                    .setAuthor(`${message.author.tag} ${(word === 'enable') ? 'enabled' : 'disabled'} chat filter`, message.author.displayAvatarURL({ dynamic: true }))
+                    .setDescription(`**Channel: **${message.channel}`)
+                    .setTimestamp();
+                    logs.send(embed2)
+                } catch (err) {
+                    console.log(err)
                 }
             })
         }
@@ -178,7 +216,9 @@ module.exports = {
                 removeFromFilter(args.slice(1).join(' '))
             } else if (args[0] === 'default') {
                 resetToDefault()
-            }
+            } else if (args[0] === 'enable' || args[0] === 'disable') {
+                enableOrDisable(args[0]);
+            } else return message.reply(`Choose between one of six command prompts: \`add, default, disable, enable, list, remove\``)
         }
     }
 }

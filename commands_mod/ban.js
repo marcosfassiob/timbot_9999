@@ -13,13 +13,12 @@ module.exports = {
     ],
     example: [
         `${process.env.PREFIX}ban <@738918188376391712>`,
-        `${process.env.PREFIX}ban <@738918188376391712> 3 moderations`
+        `${process.env.PREFIX}ban ghost <@738918188376391712> 3 moderations`
     ],
     perms: ["BAN_MEMBERS"],
     execute(client, message, args, Discord) {
 
         const member = message.mentions.members.first() || message.guild.members.cache.get(args[0])
-        const guild = message.guild;
         const logs = message.guild.channels.cache.find((channel) => channel.name.includes('timbot-logs'))
         let ghostBanned = false
         let reason;
@@ -40,7 +39,7 @@ module.exports = {
         .setTitle(`${member.user.tag} has been banned`)
         .setTimestamp()
 
-        function ban_user() {
+        const ban = () => {
             member.send(`You've been banned for: **${reason}**`)
                 .catch(err => {
                     console.log(err);
@@ -48,19 +47,17 @@ module.exports = {
                 })
                 .then(() => {
                     member.ban();
-                    message.channel.send(embed1)
-                        .then(logs.send(embed2));
+                    message.channel.send(embed1).then(logs.send(embed2));
                 }, err => {
                    console.log(err);
                 });
         }
 
-        function ghostban_user() {
+        const ghostBan = () => {
             member.ban()
                 .then(() => {
                     ghostBanned = true
-                    message.channel.send(embed1)
-                        .then(logs.send(embed2));
+                    message.channel.send(embed1).then(logs.send(embed2));
                 }, err => {
                     console.log(err);
                 })
@@ -71,13 +68,12 @@ module.exports = {
         if (args[0].toLowerCase() === 'ghost') {
             if (!args[2]) reason = "No reason given"
             else reason = args.slice(2).join(' ')
-            ghostban_user()
+            ghostban()
         } else {
             if (!args[1]) reason = "No reason given"
             else reason = args.slice(1).join(' ')
-            ban_user()
+            ban()
         }
-        modlogs(guild.id, member.id, message.author.id, this.name, reason, )
 
         //send to logs
         const embed2 = new Discord.MessageEmbed()

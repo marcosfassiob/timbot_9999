@@ -1,14 +1,13 @@
 const { pickup } = require('../words.json')
 module.exports = {
     name: 'pickup',
-    desc: "Sends a cingy pickup line for you or a friend.",
+    desc: "Sends a cringy pickup line directed towards you or a friend.",
     aliases: [
         'pickup', 
         'pickupline'
     ],
     usage: [
-        `${process.env.PREFIX}pickup`, 
-        `${process.env.PREFIX}pickup [@user]`
+        `${process.env.PREFIX}pickup [@user]`, 
     ],
     perms: "None",
     execute(client, message, args, Discord) {

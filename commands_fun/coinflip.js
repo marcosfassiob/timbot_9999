@@ -8,7 +8,7 @@ module.exports = {
     ],
     usage: `${process.env.PREFIX}random [number]`,
     perms: "None",
-    desc: 'Flips a coin',
+    desc: 'Flips a coin or outputs a random number out of your entry.',
     execute(client, message, args) {
         
         const rng_generator = (maxLimit) => {

@@ -3,7 +3,6 @@ module.exports = {
     aliases: ['avatar', 'av'],
     subcommands: ['**av guild** - shows guild server icon'],
     usage: [
-        `${process.env.PREFIX}avatar`, 
         `${process.env.PREFIX}avatar [@user]`,
         `${process.env.PREFIX}avatar [userid]`
     ],

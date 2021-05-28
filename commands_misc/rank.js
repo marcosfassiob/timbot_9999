@@ -7,13 +7,15 @@ module.exports = {
         'rank', 
         'level'
     ],
-    usage: [`${process.env.PREFIX}rank [@user]`],
+    usage: [
+        `${process.env.PREFIX}rank [@user]`,
+        `${process.env.PREFIX}rank [userid]`
+    ],
     perms: "None",
     async execute(client, message, args, Discord) {
 
         const member = message.mentions.members.first() || message.guild.members.cache.get(args[0]) || message.member;
         const url = member.user.displayAvatarURL({ dynamic: true });
-        const guild = message.guild;
 
         //progress bar
         const black_semicircle_right = '<:semicircle_black_right:830166436462592000>';
@@ -30,10 +32,14 @@ module.exports = {
         }).then(async () => {
             try {
                 const xpNeeded = level => 4 * Math.pow(level, 2) + (45 * level) + 120 
-                const results = await levelSchema.findOne({ userId: member.id, guildId: guild.id }, 'xp level -_id');
-                const { xp, level } = results
-                //xp needed = 1
-                //xp has between 0.1 * xpneeded and 0.9 * xpneeded
+                const result = await levelSchema.findOne({ guildId: message.guild.id, userId: message.member.id }, 'xp level -_id')
+                const { xp, level } = result
+
+                const leaderboard = await levelSchema.find({ guildId: message.guild.id }, 'xp level userId -_id').sort('-level -xp')
+                let n = 0 //user's rank
+                for (n; n < leaderboard.length; n++) {
+                    if (message.author.id === leaderboard[n].userId) break;
+                }
 
                 let progressBar = [blue_semicircle_left];
                 for (let i = 0.1; i < 1; i += 0.1) {
@@ -55,6 +61,7 @@ module.exports = {
                 const embed = new Discord.MessageEmbed()
                 .setColor('#003C71')
                 .setAuthor(`${member.user.tag}'s stats:`, url)
+                .setTitle(`Rank: #${n + 1}`)
                 .setDescription(`Level: ${level}${progressBar}${xp}/${xpNeeded(level)} xp`)
                 message.channel.send(embed);
             } catch (err) {

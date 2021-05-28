@@ -7,7 +7,10 @@ module.exports = {
         'leaderboard', 
         'lb'
     ],
-    usage: [`${process.env.PREFIX}leaderboard`],
+    usage: [
+        `${process.env.PREFIX}leaderboard`,
+        `${process.env.PREFIX}leaderboard clear`
+    ],
     subcommands: ['**lb clear** - clears the leaderboard'],
     perms: "ADMINISTRATOR",
     async execute(client, message, args, Discord) {

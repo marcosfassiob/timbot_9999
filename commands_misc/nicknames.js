@@ -7,7 +7,7 @@ module.exports = {
         'nicknames',
         'nn'
     ],
-    usage: [`${process.env.PREFIX}leaderboard`],
+    usage: [`${process.env.PREFIX}nicknames`],
     perms: "None",
     async execute(client, message, args, Discord) {
         const member = message.mentions.members.first() || message.guild.members.cache.get(args[0]) || message.member;
@@ -24,12 +24,14 @@ module.exports = {
                 const embed = new Discord.MessageEmbed()
                 .setColor('#003C71')
                 .setTitle(`Nicknames from ${member.user.tag}`)
-                .addField(`Past nicknames [${nicknames.length}]:`, "```\n" + nicknames.join('\n') + "```")
+                .setDescription(`\`\`\`\n${nicknames.join('\n')}\n\`\`\``)
                 .setFooter("Provided by TimBot Nicknameinator 9999")
                 message.channel.send(embed)
             } catch (err) {
                 console.log(err)
-                if (err instanceof TypeError) return message.reply("that user doesn't have any nicknames.")
+                if (err instanceof TypeError && err.message === 'Cannot destructure property \'nicknames\' of \'names[0]\' as it is undefined.') {
+                    return message.reply("that user doesn't have any nicknames.")
+                }
                 else message.reply("I couldn't fetch nicknames. Try again!")
             } 
         })

@@ -6,8 +6,7 @@ module.exports = {
         'remind'
     ],
     usage: [
-        `${process.env.PREFIX}remindme <time>`,
-        `${process.env.PREFIX}remindme <time> [reason]`
+        `${process.env.PREFIX}remindme <time> [reason]`,
     ],
     example: [
         `${process.env.PREFIX}remindme 5m`,

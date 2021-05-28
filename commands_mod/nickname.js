@@ -13,7 +13,7 @@ module.exports = {
         `${process.env.PREFIX}nickname <@user> [nickname]`, 
     ],
     example: [
-        `${process.env.PREFIX}nickname <@738918188376391712> smegma`,
+        `${process.env.PREFIX}nickname <@738918188376391712> unpingable`,
         `${process.env.PREFIX}nickname <@738918188376391712>`
     ],
     perms: ["MANAGE_NICKNAMES"],

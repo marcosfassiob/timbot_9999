@@ -11,7 +11,6 @@ module.exports = {
         `${process.env.PREFIX}purge [@user] <number>`
     ],
     example: [
-        `${process.env.PREFIX}purge 20`,
         `${process.env.PREFIX}purge <@738918188376391712> 20`
     ],
     perms: ["MANAGE_MESSAGES"],

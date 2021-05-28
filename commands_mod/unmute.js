@@ -2,8 +2,15 @@ module.exports = {
     name: 'unmute',
     desc: 'Unmutes a user',
     aliases: 'unmute',
-    usage: `${process.env.PREFIX}unmute <@user>`,
-    example: `${process.env.PREFIX}unmute <@738918188376391712>`,
+    usage: [
+        `${process.env.PREFIX}unmute <@user>`,
+        `${process.env.PREFIX}unmute <userid>`
+    ],
+    example: [
+        `${process.env.PREFIX}unmute <@738918188376391712>`,
+        `${process.env.PREFIX}unmute 738918188376391712`
+
+    ],
     perms: ["MUTE_MEMBERS"],
     execute(client, message, args, Discord) {
 

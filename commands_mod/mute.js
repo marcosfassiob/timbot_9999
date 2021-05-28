@@ -6,13 +6,10 @@ module.exports = {
     desc: 'Mutes a user',
     aliases: ['mute'],
     usage: [
-        `${process.env.PREFIX}mute <@user>`,
         `${process.env.PREFIX}mute <@user> [time] [reason]`
     ],
     example: [
         `${process.env.PREFIX}mute <@738918188376391712>`,
-        `${process.env.PREFIX}mute <@738918188376391712> spamming`,
-        `${process.env.PREFIX}mute <@738918188376391712> 30m`,
         `${process.env.PREFIX}mute <@738918188376391712> 30m spamming`
     ],
     perms: ["MUTE_MEMBERS"],

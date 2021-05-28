@@ -11,7 +11,7 @@ module.exports = {
         `${process.env.PREFIX}slowmode all <time> [reason]`,
     ],
     example: [
-        't.slowmode 3',
+        't.slowmode all 30 raid',
         't.slowmode 3 calm down',
     ],
     perms: ["MANAGE_CHANNELS"],

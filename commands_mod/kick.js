@@ -7,6 +7,9 @@ module.exports = {
         'kick',
         'boot'
     ],
+    subcommands: [
+        '**kick ghost** - kicks a member *without* DMing them'
+    ],
     usage: [
         `${process.env.PREFIX}kick <@user> [reason]`
     ],
@@ -39,30 +42,50 @@ module.exports = {
         .setTitle(`${member.user.tag} has been kicked`)
         .setTimestamp();
 
+        const kick = async () => {
+            await member.send(`You've been kicked for: **${reason}**`).catch(err => {
+                console.log(err)
+                if (err.message === 'Cannot send messages to this user') {
+                    embed1.setFooter('Couldn\'t DM user, kick logged.');
+                }
+            }).then(() => {
+                member.kick().then(() => {
+                    message.channel.send(embed1).then(logs.send(embed2))
+                }, err => {
+                    console.log(err);
+                        if (err instanceof DiscordAPIError && err.message === 'Missing Permissions') {
+                            return message.channel.send(`I couldn't kick **${member.user.tag}.**`);
+                        }
+                })
+            })
+        }
+
+        const ghost_kick = () => {
+            member.kick().then(() => {
+                message.channel.send(embed1).then(logs.send(embed2))
+            }, err => {
+                console.log(err);
+                        if (err instanceof DiscordAPIError && err.message === 'Missing Permissions') {
+                            return message.channel.send(`I couldn't kick **${member.user.tag}.**`);
+                        }
+            })
+        }
+
+        if (args[0].toLowerCase() === 'ghost') {
+            if (!args[2]) reason = "No reason given"
+            else reason = args.slice(2).join(' ')
+            ghost_kick()
+        } else {
+            if (!args[1]) reason = "No reason given"
+            else reason = args.slice(1).join(' ')
+            kick()
+        }
+
         const embed2 = new Discord.MessageEmbed()
         .setAuthor(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
         .setColor("#861F41")
         .setTitle("Member kicked")
         .setDescription(`**Member: ** ${member.user}\n**Channel: ** ${message.channel}\n**Reason: ** ${reason}`)
         .setTimestamp();
-
-        await member.send(`You've been kicked for: **${reason}**`)
-            .catch(err => {
-                console.log(err)
-                if (err.message === 'Cannot send messages to this user') {
-                    embed1.setFooter('Couldn\'t DM user, kick logged.');
-                }
-            }).then(() => {
-                member.kick()
-                    .then(() => {
-                        message.channel.send(embed1)
-                            .then(logs.send(embed2));
-                    }, err => {
-                        console.log(err);
-                        if (err instanceof DiscordAPIError && err.message === 'Missing Permissions') {
-                            return message.channel.send(`I couldn't kick **${member.user.tag}.**`);
-                        }
-                    });
-            });
     }
 }

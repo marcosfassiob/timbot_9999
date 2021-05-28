@@ -6,8 +6,8 @@ module.exports = {
         'perms'
     ],
     usage: [
-        `${process.env.PREFIX}permissions`,
         `${process.env.PREFIX}permissions [@user]`,
+        `${process.env.PREFIX}permissions [userid]`,
     ],
     example: [
         `${process.env.PREFIX}permissions`,
