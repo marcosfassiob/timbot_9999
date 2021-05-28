@@ -32,7 +32,7 @@ module.exports = {
         }).then(async () => {
             try {
                 const xpNeeded = level => 4 * Math.pow(level, 2) + (45 * level) + 120 
-                const result = await levelSchema.findOne({ guildId: message.guild.id, userId: message.member.id }, 'xp level -_id')
+                const result = await levelSchema.findOne({ guildId: message.guild.id, userId: member.id }, 'xp level -_id')
                 const { xp, level } = result
 
                 const leaderboard = await levelSchema.find({ guildId: message.guild.id }, 'xp level userId -_id').sort('-level -xp')

@@ -66,7 +66,7 @@ module.exports = (client, Discord, dayjs) => {
                     embed1.setDescription(`Kicked **${member.user.tag}.**`);
                     embed1.setImage(reject_gif[Math.floor(Math.random() * reject_gif.length)]);
                     embed1.setFooter("Provided by TimBot Altinator 9999");
-                    general.send(embed1);
+                    general.send(embed1).catch(err => console.log(err));
                     member.kick()
                         .catch(err => {
                             console.log(err)
