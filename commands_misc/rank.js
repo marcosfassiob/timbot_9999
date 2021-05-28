@@ -38,7 +38,7 @@ module.exports = {
                 const leaderboard = await levelSchema.find({ guildId: message.guild.id }, 'xp level userId -_id').sort('-level -xp')
                 let n = 0 //user's rank
                 for (n; n < leaderboard.length; n++) {
-                    if (message.author.id === leaderboard[n].userId) break;
+                    if (member.id === leaderboard[n].userId) break;
                 }
 
                 let progressBar = [blue_semicircle_left];
