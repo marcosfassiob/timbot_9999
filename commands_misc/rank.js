@@ -60,8 +60,9 @@ module.exports = {
 
                 const embed = new Discord.MessageEmbed()
                 .setColor('#003C71')
-                .setAuthor(`${member.user.tag}'s stats:`, url)
+                .setAuthor(`${member.user.tag}'s stats:`)
                 .setTitle(`Rank: #${n + 1}`)
+                .setThumbnail(url)
                 .setDescription(`Level: ${level}${progressBar}${xp}/${xpNeeded(level)} xp`)
                 message.channel.send(embed);
             } catch (err) {
