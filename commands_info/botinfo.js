@@ -15,18 +15,18 @@ module.exports = {
         .setColor("#E87722")
         .setAuthor(client.user.tag, client.user.displayAvatarURL({ dynamic: true }))
         .setTitle("Thank you for adding me!")
-        .setDescription(`${description}\nServing **${client.guilds.cache.size}** guilds for **${client.users.cache.size}** members!\n\n
-        **CHANGELOG:**\n
-        __New commands:__\n
-        • Created poll command.\n
-        • Created anti-ad config command (enable or disable).\n
-        • Added ghost kick subcommand for \`t.kick\`.\n
+        .setDescription(`${description}\nServing **${client.guilds.cache.size}** guilds for **${client.users.cache.size}** members!\n
+        **CHANGELOG:**
+        __New commands:__
+        • Created poll command.
+        • Created anti-ad config command (enable or disable).
+        • Added ghost kick subcommand for \`t.kick\`.
         __Quality of life:__
-        • Chat filter can now be enabled or disabled.\n
-        • When typing the server prefix, the help command shows up instead of the roleinfo help panel.\n
-        • When typing TimBot's default prefix, \`t.\`, while the server prefix isn't the default prefix, the server's prefix will be shown.\n
-        • Reworked help command panels to be less cluttered.\n
-        • Reworked rank command embed to look a whole lot cleaner.\n
+        • Chat filter can now be enabled or disabled.
+        • When typing the server prefix, the help command shows up instead of the roleinfo help panel.
+        • When typing TimBot's default prefix, \`t.\`, while the server prefix isn't the default prefix, the server's prefix will be shown.
+        • Reworked help command panels to be less cluttered.
+        • Reworked rank command embed to look a whole lot cleaner.
         • Rank command now shows your rank, level and xp; it's a proper rank command now lol
         `)
         .setURL(invite_link)
