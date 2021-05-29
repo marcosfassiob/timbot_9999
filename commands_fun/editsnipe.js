@@ -18,8 +18,7 @@ module.exports = {
         if (msg.newContent.length > 1000) msg.newContent = msg.newContent.substring(0, 1000) + "..."
 
         for (const word of swearWords) {
-            if (msg.newContent.replace(/[^a-zA-Z0-9]/g, "").toLowerCase().includes(word)) return message.channel.send("nice try lmao")
-                .then(m => {
+            if (msg.newContent.replace(/[^a-zA-Z0-9]/g, "").toLowerCase().includes(word)) return message.channel.send("nice try lmao").then(m => {
                     setTimeout(() => { m.delete() }, 5000)
                 })
         }

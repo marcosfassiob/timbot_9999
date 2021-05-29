@@ -26,8 +26,8 @@ module.exports = {
         `${process.env.PREFIX}filter default`,
     ],
     example: [
-        `${process.env.PREFIX}filter add tentacle hentai`,
-        `${process.env.PREFIX}filter remove hentai`
+        `${process.env.PREFIX}filter add swear word`,
+        `${process.env.PREFIX}filter remove swear word`
     ],
     perms: ["ADMINISTRATOR"],
     async execute(client, message, args, Discord) {
@@ -44,19 +44,20 @@ module.exports = {
                     await guildConfigSchema.findOneAndUpdate( 
                         { guildId: message.guild.id }, 
                         { $addToSet: { chatFilter: arguments } },
-                        { upsert: true, new: true })
+                        { upsert: true, new: true }
+                    )
         
                     const embed = new Discord.MessageEmbed()
                     .setColor("642667")
                     .setTitle(`Added phrase "${arguments}" to server's chat filter.`)
                     
+                    //logs
                     const embed2 = new Discord.MessageEmbed()
                     .setColor("642667")
                     .setAuthor(`${message.author.tag} added word/phrase`, message.author.displayAvatarURL({ dynamic: true }))
                     .setDescription(`**Channel: **${message.channel}`)
                     .addField("Phrase added:", arguments)
                     .setTimestamp()
-                    
                     await message.channel.send(embed).then(logs.send(embed2))
                 } catch (err) {
                     console.log(err)
@@ -84,6 +85,7 @@ module.exports = {
                 .setTitle(`Removed phrase "${arguments}" from server's chat filter.`)
                 .setTimestamp()
                 
+                //logs
                 const embed2 = new Discord.MessageEmbed()
                 .setColor("642667")
                 .setAuthor(`${message.author.tag} removed word/phrase`, message.author.displayAvatarURL({ dynamic: true }))
@@ -139,11 +141,12 @@ module.exports = {
                 useUnifiedTopology: true
             }).then(async () => {
                 try {
+                    //remove chat filter (and everything inside)
                     await guildConfigSchema.findOneAndUpdate(
                         { guildId: message.guild.id },
                         { $unset: { chatFilter: "" } }
                     )
-
+                    //readd chat filter (with default words from swearWords.json)
                     await guildConfigSchema.updateOne(
                         { guildId: message.guild.id },
                         { chatFilter: swearWords }
@@ -154,6 +157,7 @@ module.exports = {
                     .setTitle(`Reset chat filter settings to default.`)
                     .setTimestamp()
 
+                    //logs
                     const embed2 = new Discord.MessageEmbed()
                     .setColor("642667")
                     .setAuthor(`${message.author.tag} reset chat filter to default settings`, message.author.displayAvatarURL({ dynamic: true }))
@@ -192,6 +196,7 @@ module.exports = {
                     .setTimestamp();
                     message.channel.send(embed)
 
+                    //logs
                     const embed2 = new Discord.MessageEmbed()
                     .setColor("642667")
                     .setAuthor(`${message.author.tag} ${(word === 'enable') ? 'enabled' : 'disabled'} chat filter`, message.author.displayAvatarURL({ dynamic: true }))
@@ -204,6 +209,7 @@ module.exports = {
             })
         }
 
+        //main function - execute everything lol
         if (!args[0]) return client.commands.get('help').execute(client, message, args, Discord)
         if (!message.guild.me.hasPermission(this.perms)) return message.reply(`I'm missing perms: \`${this.perms}\``)
         if (!message.member.hasPermission(this.perms)) return message.reply(`Missing perms: \`${this.perms}\``)

@@ -20,18 +20,19 @@ module.exports = {
         .addFields(
             { name: "Developed by:", value: author, inline: true },
             { name: "Version:", value: version, inline: true },
-            { name: `Changelog (v${version}):`, value:`
-            __New commands:__
-            • Created poll command.
-            • Created anti-ad config command (enable or disable).
-            • Added ghost kick subcommand for \`t.kick\`.
-            __Quality of life:__
-            • Chat filter can now be enabled or disabled.
-            • When typing the server prefix, the help command shows up instead of the roleinfo help panel.
-            • When typing TimBot's default prefix, \`t.\`, while the server prefix isn't the default prefix, the server's prefix will be shown.
-            • Reworked help command panels to be less cluttered.
-            • Reworked rank command embed to look a whole lot cleaner.
-            • Rank command now shows your rank, level and xp; it's a proper rank command now lol` }
+            { name: `Changelog (v${version}):`, value:
+                `__New commands:__
+                • Created poll command.
+                • Created anti-ad config command (enable or disable).
+                • Added ghost kick subcommand for \`t.kick\`.
+                __Quality of life:__
+                • Chat filter can now be enabled or disabled.
+                • When typing the server prefix, the help command shows up instead of the roleinfo help panel.
+                • When typing TimBot's default prefix, \`t.\`, while the server prefix isn't the default prefix, the server's prefix will be shown.
+                • Reworked help command panels to be less cluttered.
+                • Reworked rank command embed to look a whole lot cleaner.
+                • Rank command now shows your rank, level and xp; it's a proper rank command now lol` 
+            }
         )
         message.channel.send(embed)
     }

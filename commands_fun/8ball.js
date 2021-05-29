@@ -6,13 +6,13 @@ module.exports = {
         'eightball'
     ],
     usage: `${process.env.PREFIX}8ball <question>`,
-    example: `${process.env.PREFIX}8ball is TimBot 9999 the best bot?`,
+    example: `${process.env.PREFIX}8ball is TimBot 9999 best bot?`,
     perms: "None",
     desc: 'Have a question on your mind? Ask the 8ball.',
     execute(client, message, args) {
         let question = args.join(' ')
         if (!question) return message.reply('please ask me something')
-        const random = Math.floor(Math.random() * eightBall.length)
-        message.reply(eightBall[random])
+        const n = Math.floor(Math.random() * eightBall.length)
+        message.reply(eightBall[n])
     }
 }

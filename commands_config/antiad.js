@@ -38,7 +38,7 @@ module.exports = {
                         { guildId: message.guild.id },
                         { $set: { enableAntiAd: false } }
                     )
-                } else return message.reply(`Choose between one of six command prompts: \`enable, disable\``)
+                } else return message.reply(`Choose between one of two command prompts: \`enable, disable\``)
                 const embed = new Discord.MessageEmbed()
                 .setColor("642667")
                 .setTitle(`${(prompt === 'enable') ? 'Enabled' : 'Disabled'} anti-ad. ${(prompt === 'enable') ? 'Nobody' : 'Anyone'} can send invite links now.`)

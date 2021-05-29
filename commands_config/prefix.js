@@ -30,6 +30,7 @@ module.exports = {
         .setTitle(`Changed server prefix to "${prefix}"`)
         .setTimestamp()
 
+        //logs
         const embed2 = new Discord.MessageEmbed()
         .setColor("#642667")
         .setAuthor(`${message.author.tag} changed server prefix`, message.author.displayAvatarURL({ dynamic: true }))

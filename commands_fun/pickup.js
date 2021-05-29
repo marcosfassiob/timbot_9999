@@ -14,13 +14,10 @@ module.exports = {
 
         const member = message.mentions.members.first() || message.guild.members.cache.get(args[0]) || message.member
         const rand = Math.floor(Math.random() * pickup.length);
-
         const embed = new Discord.MessageEmbed()
         .setColor("#C64600")
         .setTitle(`Hey ${member.user.username}, ${pickup[rand]}`)
         .setFooter(`From yours truly, ${message.author.tag}`)
-
-        message.channel.send(embed)
-            .catch(e => console.log(e.stack))
+        message.channel.send(embed).catch(e => console.log(e.stack))
     }
 }

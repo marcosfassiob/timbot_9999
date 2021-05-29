@@ -26,8 +26,8 @@ module.exports = {
             }).then(async () => {
                 try {
                     const results = await levelSchema.find({ guildId: message.guild.id }, 'userId xp level -_id')
-                        .sort('-level -xp')
-                        .limit(10);
+                    .sort('-level -xp')
+                    .limit(10);
     
                     let description = [];
                     for (let i = 0; i < 10; i++) {
@@ -85,13 +85,15 @@ module.exports = {
 
                                     //FOR MY GUILD ONLY
                                     if (message.guild.id === '778461267999588363') {
-                                        const role = message.guild.roles.cache.get('778478893451182140');
-                                        role.members.forEach(member => member.roles.remove(role))
+                                        const regulars_role = message.guild.roles.cache.get('778478893451182140');
+                                        regulars_role.members.forEach(member => member.roles.remove(regulars_role));
+                                        const active_role = message.guild.roles.cache.get('847730653466460160');
+                                        active_role.members.forEach(member => member.roles.remove(regulars_role));
+                                        const hella_active_role = message.guild.roles.cache.get('847730964619591701');
+                                        hella_active_role.members.forEach(member => member.roles.remove(regulars_role));
                                     }
                                 } catch (err) {
                                     console.log(err)
-                                } finally {
-                                    mongoose.connection.close();
                                 }
                             }, err => console.log(err));
                         }
