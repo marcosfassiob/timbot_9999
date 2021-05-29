@@ -19,7 +19,20 @@ module.exports = {
         .setURL(invite_link)
         .addFields(
             { name: "Developed by:", value: author, inline: true },
-            { name: "Version:", value: version, inline: true }
+            { name: "Version:", value: version, inline: true },
+            { name: `Changelog (${version}):`, value: `
+            __New commands:__
+            • Created poll command.\n
+            • Created anti-ad config command (enable or disable).\n
+            • Added ghost kick subcommand for \`t.kick\`.\n
+            __Quality of life:__
+            • Chat filter can now be enabled or disabled.\n
+            • When typing the server prefix, the help command shows up instead of the roleinfo help panel.\n
+            • When typing TimBot's default prefix, \`t.\`, while the server prefix isn't the default prefix, the server's prefix will be shown.\n
+            • Reworked help command panels to be less cluttered.\n
+            • Reworked rank command embed to look a whole lot cleaner.\n
+            • Rank command now shows your rank, level and xp; it's a proper rank command now lol
+            `}
         )
         message.channel.send(embed)
     }
