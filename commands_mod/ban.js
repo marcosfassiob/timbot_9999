@@ -27,7 +27,7 @@ module.exports = {
         if (!message.member.hasPermission(this.perms)) return message.channel.send(`Missing perms: \`${this.perms}\``)
         if (!message.guild.me.hasPermission(this.perms)) return message.channel.send(`I\`m missing perms: \`${this.perms}\``)
         if (!member) return message.reply("please specify who you want to ban!")
-        if (member.id === message.member.id) return message.channel.send(`**${member.user.tag}** is immune to bans`)
+        if (member.id === message.member.id) return message.channel.send(`Why are you trying to ban yourself?`)
 
         for (perm of adminPerms) {
             if (member.hasPermission(perm)) return message.reply(`**${member.user.tag}** cannot be banned.`)
