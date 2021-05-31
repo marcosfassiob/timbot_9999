@@ -11,7 +11,7 @@ module.exports = (client, Discord, dayjs) => {
         const hours_since_reg = dayjs(today).diff(date_registered, 'hours');
         const hours = Math.floor(hours_since_reg - days_since_reg * 24) + 1
 
-        const color = ((days_since_reg >= 15 && days_since_reg <= 45) || member.user.bot) ? "FFD700" : (days_since_reg < 15) ? "FF0000" : "00FF00";
+        const color = ((days_since_reg >= 15 && days_since_reg <= 45)) ? "FFD700" : (days_since_reg < 15 || (!member.user.flags.toArray().includes('VERIFIED_BOT') && member.user.bot)) ? "FF0000" : "00FF00";
         const welcome_gif = [
             'https://usaupload.com/file/APZ/wave2.gif', 
             'https://usaupload.com/file/APW/yuru_camp_2.gif',
@@ -25,7 +25,6 @@ module.exports = (client, Discord, dayjs) => {
         ];
 
         const reject_gif = [
-            'https://usaupload.com/file/AQ2/reject.gif',
             'https://usaupload.com/file/ASB/reject3.gif',
             'https://usaupload.com/file/ASR/reject4.gif'
         ];
@@ -62,7 +61,7 @@ module.exports = (client, Discord, dayjs) => {
                         embed1.setFooter("Couldn't DM user, oh well ¯\\_(ツ)_/¯");
                     }
                 }).then(() => {
-                    embed1.setAuthor(`Suspicious user detected!`, member.user.displayAvatarURL({ dynamic: true }));
+                    embed1.setAuthor(`Suspicious ${member.user.bot ? 'bot' : 'user'} detected!`, member.user.displayAvatarURL({ dynamic: true }));
                     embed1.setDescription(`Kicked **${member.user.tag}.**`);
                     embed1.setImage(reject_gif[Math.floor(Math.random() * reject_gif.length)]);
                     embed1.setFooter("Provided by TimBot Altinator 9999");
@@ -76,7 +75,7 @@ module.exports = (client, Discord, dayjs) => {
             }
 
         //MAIN FUNCTION
-        if (days_since_reg < 15) {
+        if (days_since_reg < 15 || (!member.user.flags.toArray().includes('VERIFIED_BOT') && member.user.bot)) {
             kickMember().then(logs.send(embed2))
         } else {
             general.send(embed1).then(logs.send(embed2))
