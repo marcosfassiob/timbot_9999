@@ -27,11 +27,11 @@ module.exports = {
         function help() {
             const embed1 = new Discord.MessageEmbed()
             .setColor("#E87722")
-            .setTitle("Invite TimBot 9999 to your server!")
-            .setURL(invite_link)
+            .setTitle("List of commands for TimBot 9999")
             .setDescription(
                 `Current prefix: \`${result.prefix}\`
                 Need additional help? Type \`${result.prefix}help <command>\`
+                [Invite me to your server!](${invite_link})
                 [Join our Discord server!](https://discord.gg/q439qazkT5)`
             )
             .addFields(
