@@ -1,4 +1,4 @@
-const { version, author, description } = require('../package.json')
+const { version, author } = require('../package.json')
 const { invite_link } = require('../config.json')
 module.exports = {
     name: 'botinfo',
@@ -14,12 +14,13 @@ module.exports = {
         const embed = new Discord.MessageEmbed()
         .setColor("#E87722")
         .setAuthor(client.user.tag, client.user.displayAvatarURL({ dynamic: true }))
-        .setTitle("Thank you for adding me!")
+        .setTitle("Thank you for adding TimBot 9999!")
         .setDescription(
-            `${description}\nServing **${client.guilds.cache.size}** guilds for **${client.users.cache.size}** members!
-            [Link to GitHub repository](https://github.com/timhonks/TimBot_9999)`
+            `Serving **${client.guilds.cache.size}** guilds for **${client.users.cache.size}** members!
+            [Invite me to your server!](${invite_link})
+            [Need assistance? Join our server!](https://discord.gg/q439qazkT5)
+            [Link to GitHub repository:](https://github.com/timhonks/TimBot_9999)`
         )
-        .setURL(invite_link)
         .addFields(
             { name: "Developed by:", value: author, inline: true },
             { name: "Version:", value: version, inline: true },

@@ -86,7 +86,7 @@ module.exports = (client, Discord) => {
             && !client.commands_mod.has(command) 
             && !client.commands_config.has(command) 
             && num === 10) {
-                return message.channel.send("If you're interested in bot updates and other gimmicks from me you should join my server!\nhttps://discord.gg/q439qazkT5");
+                return message.channel.send("Interested in bot updates? Need additional help with TimBot? Join our server!\nhttps://discord.gg/q439qazkT5");
             }
         }
     })   

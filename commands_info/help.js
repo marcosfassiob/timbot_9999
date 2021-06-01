@@ -21,15 +21,19 @@ module.exports = {
         const misc_commands = client.commands_misc.map(c => `\`${c.name}\``).join(' ');
         const config_commands = client.commands_config.map(c => `\`${c.name}\``).join(' ');
 
-        const loadedPrefix = await guildConfigSchema.findOne({ guildId: message.guild.id }, 'prefix');
-        const { prefix } = loadedPrefix;
+        const result = await guildConfigSchema.findOne({ guildId: message.guild.id }, 'prefix');
+        const { prefix } = result;
 
         function help() {
             const embed1 = new Discord.MessageEmbed()
             .setColor("#E87722")
             .setTitle("Invite TimBot 9999 to your server!")
             .setURL(invite_link)
-            .setDescription(`Current prefix: \`${loadedPrefix.prefix}\`\nNeed additional help? Type \`${loadedPrefix.prefix}help <command>\``)
+            .setDescription(
+                `Current prefix: \`${result.prefix}\`
+                Need additional help? Type \`${result.prefix}help <command>\`
+                [Join our Discord server!](https://discord.gg/q439qazkT5)`
+            )
             .addFields(
                 { name: "Fun commands:", value: fun_commands, inline: true },
                 { name: "Info commands:", value: info_commands, inline: true }, 
@@ -82,7 +86,7 @@ module.exports = {
             message.channel.send(embed5)
         }
         
-        if (!args[0] && message.content.startsWith(`${loadedPrefix.prefix}help`) || message.content === `${prefix}`) help()
+        if (!args[0] && message.content.startsWith(`${result.prefix}help`) || message.content === `${prefix}`) help()
         else if (!message.content.startsWith(`${prefix}help`)) helpPrompt()
         else if (!client.commands.has(args[0]) && !client.commands.find(a => a.aliases && a.aliases.includes(args[0].toLowerCase()))) {
             return message.reply(`\`${args.join(' ')}\` is not a valid command.`)
