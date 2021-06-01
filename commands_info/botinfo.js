@@ -13,7 +13,6 @@ module.exports = {
     execute(client, message, args, Discord) {
         const embed = new Discord.MessageEmbed()
         .setColor("#E87722")
-        .setAuthor(client.user.tag, client.user.displayAvatarURL({ dynamic: true }))
         .setTitle("Thank you for adding TimBot 9999!")
         .setDescription(
             `Serving **${client.guilds.cache.size}** guilds for **${client.users.cache.size}** members!
