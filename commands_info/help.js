@@ -30,7 +30,6 @@ module.exports = {
             .setTitle("List of commands for TimBot 9999")
             .setDescription(
                 `Current prefix: \`${result.prefix}\`
-                Need additional help? Type \`${result.prefix}help <command>\`
                 [Invite me to your server!](${invite_link})
                 [Join our Discord server!](https://discord.gg/q439qazkT5)`
             )
@@ -41,6 +40,7 @@ module.exports = {
                 { name: "Misc. commands:", value: misc_commands, inline: true },
                 { name: "Config commands:", value: config_commands, inline: true }
             )
+            .setFooter(`Need additional help? Type \`${result.prefix}help <command>\``)
             message.channel.send(embed1)
         }
 
