@@ -17,7 +17,7 @@ module.exports = {
         .setTitle("Thank you for adding me!")
         .setDescription(
             `${description}\nServing **${client.guilds.cache.size}** guilds for **${client.users.cache.size}** members!
-            [Link to GitHub repository](${newMessage.url})`
+            [Link to GitHub repository](https://github.com/timhonks/TimBot_9999)`
         )
         .setURL(invite_link)
         .addFields(
