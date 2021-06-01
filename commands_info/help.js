@@ -40,7 +40,7 @@ module.exports = {
                 { name: "Misc. commands:", value: misc_commands, inline: true },
                 { name: "Config commands:", value: config_commands, inline: true }
             )
-            .setFooter(`Need additional help? Type \`${result.prefix}help <command>\``)
+            .setFooter(`Need additional help? Type "${result.prefix}help <command>"`)
             message.channel.send(embed1)
         }
 
