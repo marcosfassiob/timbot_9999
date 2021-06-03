@@ -26,10 +26,12 @@ module.exports = {
         .setAuthor(`${message.author.tag} has started a new poll!`, message.author.displayAvatarURL({ dynamic: true }))
         .setDescription(description.join('\n'))
         .setTitle(array[0])
-        message.channel.send(embed).then(m => {
-            for (let n = 1; n < array.length; n++) {
-                m.react(`${digits[n]}`)
-            }
+        message.delete().then(() => {
+            message.channel.send(embed).then(m => {
+                for (let n = 1; n < array.length; n++) {
+                    m.react(`${digits[n]}`)
+                }
+            })
         })
     }
 }
