@@ -1,6 +1,6 @@
 {
   "name": "timbot_9999",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "I'm just another general-purpose bot with gimmick commands...",
   "main": "index.js",
   "scripts": {

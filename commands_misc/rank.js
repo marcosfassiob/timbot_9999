@@ -42,12 +42,12 @@ module.exports = {
                 }
 
                 let progressBar = [blue_semicircle_left];
-                for (let i = 0.1; i < 1; i += 0.1) {
+                for (let i = 0.125; i < 1; i += 0.125) {
                     switch (true) {
                         case (xp >= xpNeeded(level) * i):
                             progressBar.push(blue_solid_bar);
                             break;
-                        case (xp < xpNeeded(level) * i && xp >= xpNeeded(level) * (i - 0.1)):
+                        case (xp < xpNeeded(level) * i && xp >= xpNeeded(level) * (i - 0.125)):
                             progressBar.push(blue_mix_bar);
                             break;
                         case (xp < xpNeeded(level) * i):
