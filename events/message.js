@@ -60,7 +60,7 @@ module.exports = (client, Discord) => {
                         m.delete()
                     }, 5 * 1000)
                 })
-                .catch(console.error)
+                .catch(err => console.log(err))
         }
 
         //set up everything for commands

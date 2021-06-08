@@ -93,7 +93,8 @@ module.exports = (client) => {
                     }
                 }
             } catch (err) {
-                if (err.message !== 'MongoError: Cannot use a session that has ended') console.log(err);
+                console.log(err);
+                mongoose.connection.close();
             }
         })
         
@@ -105,7 +106,7 @@ module.exports = (client) => {
                 max = Math.floor(max);
                 return Math.floor(Math.random() * (max - min) + min);
             }
-            addXP(message.guild.id, message.member.id, random(5, 12), message)
+            addXP(message.guild.id, message.member.id, random(10, 25), message)
             onCooldown.add(message.author.id)
             setTimeout(() => onCooldown.delete(message.author.id), 20 * 1000)
         }  

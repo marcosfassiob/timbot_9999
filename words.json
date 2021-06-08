@@ -63,7 +63,9 @@
         "What is the most annoying thing you have come across?",
         "What is your favorite song and why?",
         "what is your favorite album? Why?",
-        "What's your favorite gif? Send it (if you can obviously)!"
+        "What's your favorite gif? Send it (if you can obviously)!",
+        "What's the strangest dream you've ever had?",
+        "Boxers or briefs?"
     ],
 
     "pickup":
@@ -125,5 +127,28 @@
         "highly doubt it lmao",
         "without a doubt",
         "yes"
-    ]
+    ],
+
+    "truthOrDare":
+    {
+        "truth":
+        [
+            "What’s the last lie you told?",
+            "What is the worst thing you've done to someone?",
+            "Have you ever peed in a pool?",
+            "Have you ever lied about your age?",
+            "Have you ever seen a dead body?",
+            "What was the edgiest status you've used on Discord?",
+            "What is one major turn-off?",
+            "Have you ever been arrested?"
+        ],
+        "dare":
+        [
+            "Post a photo of yourself in the chat.",
+            "Tell the last person you've DMed that you're into them.",
+            "Make your status something incredibly edgy and keep it for a day.",
+            "Switch your username with someone else and keep it that way for a day.",
+            "Join a voice channel with somebody on and annoy them."
+        ]
+    }
 }

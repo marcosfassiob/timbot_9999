@@ -1,6 +1,7 @@
 const { swearWords, bestWords } = require('../words.json')
 const { adminPerms } = require('../config.json')
-const message = require('./message')
+const mongoose = require('mongoose')
+const guildConfigSchema = require('../schemas/guild-config-schema')
 module.exports = (client, Discord) => {
     client.on('messageUpdate', async (oldMessage, newMessage) => {
 
@@ -23,45 +24,40 @@ module.exports = (client, Discord) => {
         }
 
         //chat filter 
-        for (const word of swearWords) {
-            if (newMessage.content.replace(/[^a-zA-Z0-9]/g, "").toLowerCase().includes(word)) {
-                console.log(`${newMessage.author.tag}'s messageUpdate filtered: ${newMessage.content}`)
-                if (newMessage.author.bot) return;
-                if (newMessage.member.hasPermission(adminPerms)) return;
-                newMessage.delete();
-                newMessage.reply("Watch your language.")
+        await mongoose.connect(process.env.MONGO_URI, {
+            useNewUrlParser: true,
+            useFindAndModify: false,
+            useUnifiedTopology: true
+        }).then(async () => {
+            const filter = await guildConfigSchema.findOne({ guildId: oldMessage.guild.id }, 'chatFilter enableChatFilter');
+            const { chatFilter, enableChatFilter } = filter;
+            for (const word of chatFilter) {
+                if (newMessage.content.toLowerCase().includes(word)) {
+                    if (newMessage.member.hasPermission(adminPerms) || enableChatFilter === false) return;
+                    newMessage.delete();
+                    newMessage.reply("Watch your language.")
                     .then(m => {
-                        setTimeout(function() {
-                            m.delete()
-                        }, 5000)
+                        setTimeout(() => { m.delete() }, 5000)
                     })
-                    .catch(console.error)
-                return;
+                    .catch(err => console.log(err));
+                    return;
+                }
             }
+        })
+        
+        //deletes message if over 1000 chars
+        if (newMessage.content.length > 1000) {
+            for (const perm of adminPerms) {
+                if (newMessage.member.hasPermission(perm)) return;
+            }
+            newMessage.delete()
+            newMessage.reply("Messages longer than 1000 characters get auto-deleted.")
+            .then(m => {
+                setTimeout(() => { m.delete() }, 5000)
+            }).catch(err => console.log(err))
         }
 
-        //snipes
-        if (!oldMessage.author.bot) {
-            client.editsnipes.set(oldMessage.channel.id, {
-                oldContent: oldMessage.content,
-                newContent: newMessage.content,
-                author: oldMessage.member,
-                oldImage: oldMessage.attachments.first() ? oldMessage.attachments.first().proxyURL : null,
-                newImage: newMessage.attachments.first() ? newMessage.attachments.first().proxyURL : null
-            })
-        }
-
-        //chat filter
-        for (const word of swearWords) {
-            if (newMessage.content.replace(/[^a-zA-Z0-9]/g, "").includes(word)) {
-                if (message.member.hasPermission(adminPerms)) return;
-                newMessage.delete()
-                    .then(m => {
-                        setTimeout(() => m.delete(), 5000)
-                    })
-                newMessage.reply("Watch your language.")
-            }
-        }
+ 
 
         //edit a couple things cause if not bot goes byebye
         if (oldMessage.content === newMessage.content) return;
@@ -79,5 +75,14 @@ module.exports = (client, Discord) => {
             .setTimestamp()
             logs.send(embed)
         }
+        
+        //snipes
+        client.editsnipes.set(oldMessage.channel.id, {
+            oldContent: oldMessage.content,
+            newContent: newMessage.content,
+            author: oldMessage.member,
+            oldImage: oldMessage.attachments.first() ? oldMessage.attachments.first().proxyURL : null,
+            newImage: newMessage.attachments.first() ? newMessage.attachments.first().proxyURL : null
+        })
     })
 }

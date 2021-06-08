@@ -1,4 +1,6 @@
 const { swearWords, bestWords } = require('../words.json')
+const mongoose = require('mongoose')
+const guildConfigSchema = require('../schemas/guild-config-schema')
 module.exports = {
     name: 'editsnipe',
     desc: 'Fetches the last edited message',
@@ -12,17 +14,8 @@ module.exports = {
 
         const logs = message.guild.channels.cache.find((c) => c.name.includes('timbot-logs'));
         const msg = client.editsnipes.get(message.channel.id)
-
         if (!msg) return message.reply("Nothing to editsnipe!")
-        if (msg.oldContent.length > 1000) msg.oldContent = msg.oldContent.substring(0, 1000) + "..."
-        if (msg.newContent.length > 1000) msg.newContent = msg.newContent.substring(0, 1000) + "..."
 
-        for (const word of swearWords) {
-            if (msg.newContent.replace(/[^a-zA-Z0-9]/g, "").toLowerCase().includes(word)) return message.channel.send("nice try lmao").then(m => {
-                    setTimeout(() => { m.delete() }, 5000)
-                })
-        }
-        
         //snipe itself
         const embed1 = new Discord.MessageEmbed()
         .setColor("#C64600")
@@ -33,7 +26,6 @@ module.exports = {
             { name: "Edited message:", value: msg.newContent, inline: true }
         )
         .setFooter("get fucked lol")
-        message.channel.send(embed1)
 
         //send to logs
         const embed2 = new Discord.MessageEmbed()
@@ -46,7 +38,27 @@ module.exports = {
             { name: "Edited message:", value: msg.newContent, inline: true }
         )
         .setTimestamp()
-
-        logs.send(embed2).catch(console.error)
+        
+        await mongoose.connect(process.env.MONGO_URI, {
+            useNewUrlParser: true,
+            useFindAndModify: false,
+            useUnifiedTopology: true
+        }).then(async () => {
+            const filter = await guildConfigSchema.findOne({ guildId: message.guild.id }, 'chatFilter');
+            const { chatFilter } = filter;
+            for (const word of chatFilter) {
+                if (msg.newContent.toLowerCase().includes(word)) {
+                    return message.channel.send("nice try lmao").then(m => {
+                        setTimeout(() => { m.delete() }, 5000)
+                    })
+                }
+            }
+            message.channel.send(embed1)
+            .then(() => {
+                logs.send(embed2)
+            }, err => {
+                console.log(err)
+            })
+        })
     }
 }

@@ -35,7 +35,7 @@ module.exports = {
         if (args[1]) {
             if (args[1].match(/^\d/)) {
                 if (args[2]) reason = args.slice(2).join(' ')
-                time = ms(ms(args[1])) 
+                time = ms(ms(args[1]), { long: true }) 
             } else {
                 reason = args.slice(1).join(' ')  
                 time = "Indefinite"

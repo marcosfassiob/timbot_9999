@@ -18,16 +18,11 @@ module.exports = {
             `Serving **${client.guilds.cache.size}** guilds for **${client.users.cache.size}** members!
             [Invite me to your server!](${invite_link})
             [Need assistance? Join our server!](https://discord.gg/q439qazkT5)
-            [Link to GitHub repository:](https://github.com/timhonks/TimBot_9999)`
+            [Link to GitHub repository](https://github.com/timhonks/TimBot_9999)`
         )
         .addFields(
             { name: "Developed by:", value: author, inline: true },
             { name: "Version:", value: version, inline: true },
-            { name: `Changelog (v${version}):`, value:
-                `__Quality of life:__
-                • Original message is deleted before poll embed shows up.
-                • Rank progress bar shortened to look cleaner on mobile.`
-            }
         )
         message.channel.send(embed)
     }
