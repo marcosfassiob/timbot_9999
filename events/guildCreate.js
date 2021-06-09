@@ -32,8 +32,8 @@ module.exports = (client, Discord) => {
         await Discord.Util.delayFor(500);
         const entry = await guild.fetchAuditLogs({ type: 'BOT_ADD' }).then(audit => audit.entries.first());
         const channel = guild.channels.cache.find(c => c.type === 'text' && c.viewable === true) //if user's DMs are closed
-        let timbotLogs = guild.channels.cache.some(c => c.name.includes('timbot-logs') && c.type === "text");
-        let mutedRole = guild.roles.cache.find(r => r.name.toLowerCase().includes('muted'));
+        let timbotLogs = guild.channels.cache.some(c => c.name.includes('timbot-logs') && c.type === "text"); //if someone already set up timbot logs
+        let mutedRole = guild.roles.cache.find(r => r.name.toLowerCase().includes('muted')); //if there's already a muted role
 
         //thanks-for-adding-me message
         const embed1 = new Discord.MessageEmbed()
@@ -54,12 +54,13 @@ module.exports = (client, Discord) => {
                         color: "#7b5c00",
                         permissions: []
                     }
-                }).then(() => {
-                    mutedRole = guild.roles.cache.find((r) => r.name.toLowerCase().includes('muted'));
+                }).then(role => {
                     guild.channels.cache.forEach(c => {
-                        c.overwritePermissions([
-                            { id: mutedRole.id, deny: ["SEND_MESSAGES", "ADD_REACTIONS", "SPEAK"] }
-                        ]);
+                        c.updateOverwrite(role, {
+                            SEND_MESSAGES: false,
+                            SPEAK: false,
+                            ADD_REACTIONS: false
+                        });
                     });
                 });
             } else console.log("muted role already set up");
