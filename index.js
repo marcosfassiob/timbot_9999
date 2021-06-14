@@ -25,6 +25,7 @@ const inviteCreate = require('./events/inviteCreate');
 const message = require('./events/message');
 const messageDelete = require('./events/messageDelete');
 const messageUpdate = require('./events/messageUpdate');
+const voiceStateUpdate = require('./events/voiceStateUpdate');
 const levels = require('./models/levels');
 const perServerSettings = require('./models/per-server-settings');
 
@@ -53,9 +54,10 @@ client.on('ready', async () => {
     message.loadPrefixes(client)
     messageDelete(client, Discord, dayjs)
     messageUpdate(client, Discord)
+    voiceStateUpdate(client, Discord)
 
     //models
-    levels(client)
+    levels(client, Discord)
     perServerSettings(client)
     
     console.log("TimBot 9999 ACTIVATED");

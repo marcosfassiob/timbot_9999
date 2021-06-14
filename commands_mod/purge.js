@@ -3,7 +3,6 @@ module.exports = {
     desc: 'Deletes a number of messages',
     aliases: [
         'purge',
-        'prune',
         'clear',
         'delete',
     ],

@@ -1,4 +1,11 @@
 {
+    "commandPrompts":
+    [
+        "**TIP:** Have a bug you want to report? Type `t.reportbug` and send us a bug report.",
+        "**TIP:** Want to suggest something for TimBot? Type `t.suggest` and suggest us something!",
+        "**SHAMELESS PLUG:** Interested in TimBot and want to be the first to receive updates? Join our Discord server: https://discord.gg/q439qazkT5"
+    ],
+
     "swearWords":
     [
         "coon",
@@ -105,28 +112,68 @@
         "are you a light switch? You keep turning me on every time you're around.",
         "you're like a fine wine; the more I drink from you, the hotter I feel.",
         "are you a torch? 'Cause you light up my world.",
-        "you’re the \"nothing\" I tell my mom when she asks me why I’m smiling at my phone so much."
+        "you’re the \"nothing\" I tell my mom when she asks me why I’m smiling at my phone so much.",
+        "are you my appendix? 'Cause I don't really understand how you work, but this feeling in my stomach makes me want to take you out."
+    ],
+
+    "dadjoke":
+    [
+        "Two guys walked into a bar. The third guy ducked.",
+        "Why are elevator jokes so classic and good? They work on many levels.",
+        "What did the police officer say to his belly-button? You’re under a vest.",
+        "What did Tennessee? The same thing as Arkansas.",
+        "My wife asked me to go get 6 cans of Sprite from the grocery store. I realized when I got home that I had picked 7 up.",
+        "Why do some couples go to the gym? Because they want their relationship to work out.",
+        "Did you hear about the kidnapping at school? It’s fine, he woke up.",
+        "Why did the man fall down the well? Because he couldn’t see that well.",
+        "I used to hate facial hair, but then it grew on me.",
+        "Dogs can’t operate MRI machines. But catscan.",
+        "Why is cold water so insecure? Because it’s never called hot.",
+        "I was going to tell a time-traveling joke, but you guys didn’t like it.",
+        "Stop looking for the perfect match... use a lighter.",
+        "What did the drummer call his twin daughters? Anna One, Anna Two!",
+        "Want to hear a joke about construction? I’m still working on it.",
+        "Someone told me that I should write a book. I said, \"That's a novel concept.\"",
+        "What’s Forrest Gump’s password? 1forrest1",
+        "Why are spiders so smart? They can find everything on the web.",
+        "What does a house wear? Address.",
+        "When my wife told me to stop impersonating a flamingo, I had to put my foot down.",
+        "What do you call a fish with no eyes? A fsh.",
+        "The other day I was listening to a song about superglue, it's been stuck in my head ever since.",
+        "I knew I shouldn't steal a mixer from work, but it was a whisk I was willing to take."
     ],
 
     "eightBall":
     [
         "according to me, yeah",
-        "ask that again later",
+        "what the hell is wrong with you?",
+        "when Half-Life 3 comes out",
+        "when Biden is president",
         "seriously? you're asking me *that?*",
-        "i think it's best for both of us if i don't tell the result",
+        "i think it's best for both of us if i don't tell you the result",
         "say that again but in English",
         "the hell kinda question is that?",
+        "dude. are you fucking kidding me?",
+        "*breathes in and out...* no.",
         "yup lmao",
+        "it's pretty much guaranteed",
         "when pigs fly",
         "most likely",
         "i mean i guess...",
         "stop trying to make me say yes",
+        "stop trying to make me say no",
         "you're kinda screwed",
+        "you have literally ZERO chance of that happening",
         "you've got a chance",
-        "the stars might align in your favor",
+        "things might actually work out for you",
         "highly doubt it lmao",
         "without a doubt",
-        "yes"
+        "ask me that again, i think my code broke again",
+        "no dude, just... no",
+        "if you think so, then i think so!",
+        "lol gl with that",
+        "did you cry after watching that one Violet Evergarden episode?",
+        "maybe? im too focused on writing pickup lines"
     ],
 
     "truthOrDare":

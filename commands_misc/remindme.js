@@ -20,7 +20,7 @@ module.exports = {
         if (!args[0].match(/^\d/)) return message.reply('please enter a number.')
         if (!args[1]) return message.reply(`please write out a reason to remind you.`)
 
-        let reason = args[1];
+        let reason = args.slice(1).join(' ');
         let time = ms(ms(args[0]), { long: true });
 
         message.channel.send(`Okay, in **${time}** I'll remind you to **${reason}**`).then(() => {

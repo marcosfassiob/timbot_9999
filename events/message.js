@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const guildConfigSchema = require('../schemas/guild-config-schema')
 const { adminPerms } = require('../config.json')
-const { bestWords, triggerWords } = require('../words.json')
+const { bestWords, triggerWords, commandPrompts } = require('../words.json')
 const guildPrefixes = {}
 module.exports = (client, Discord) => {
     client.on('message', async message => {        
@@ -86,7 +86,8 @@ module.exports = (client, Discord) => {
             && !client.commands_mod.has(command) 
             && !client.commands_config.has(command) 
             && num === 10) {
-                return message.channel.send("Interested in bot updates? Need additional help with TimBot? Join our server!\nhttps://discord.gg/q439qazkT5");
+                const n = Math.floor(Math.random() * commandPrompts.length + 1);
+                message.channel.send(commandPrompts[n])
             }
         }
     })   
