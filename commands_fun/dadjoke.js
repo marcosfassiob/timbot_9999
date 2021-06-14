@@ -7,8 +7,11 @@ module.exports = {
     usage: `${process.env.PREFIX}dadjoke`,
     perms: "None",
     desc: 'Tells a dad joke.',
-    execute(client, message, args) {
+    execute(client, message, args, Discord) {
         const n = Math.floor(Math.random() * dadjoke.length + 1);
-        message.channel.send(dadjoke[n])
+        const embed = new Discord.MessageEmbed()
+        .setColor('C64600')
+        .setDescription(dadjoke[n])
+        message.channel.send(embed)
     }
 }
