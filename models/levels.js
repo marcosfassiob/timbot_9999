@@ -71,15 +71,13 @@ module.exports = (client, Discord) => {
                 const { level } = result;
 
                 if (!onCooldownVoice.has(message.author.id)) {
-                    setInterval(() => {
-                        if (member.voice.channel) {
-                            if (member.voice.channel.id !== '853099601669914624') {
-                                addXP(guild.id, member.id, 5, message);
-                            }
-                            onCooldownVoice.add(message.author.id);
-                            setTimeout(() => onCooldown.delete(message.author.id), 60 * 1000);
+                    if (member.voice.channel) {
+                        if (member.voice.channel.id !== '853099601669914624') {
+                            addXP(guild.id, member.id, 5, message);
                         }
-                    }, 60 * 1000)
+                        onCooldownVoice.add(message.author.id);
+                        setTimeout(() => onCooldown.delete(message.author.id), 60 * 1000);
+                    }
                 }
                 
                 if (!onCooldown.has(message.author.id)) {
