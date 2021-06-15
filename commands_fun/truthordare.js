@@ -50,7 +50,8 @@ module.exports = {
                     msg.edit(dareEmbed)
                 } else if (reaction._emoji.name === '🍸') {
                     const random = Math.floor(Math.random * 2)
-                    const n = Math.floor(Math.random() * (random === 0) ? truth.length : dare.length);
+                    const length = (random === 0) ? truth.length : dare.length
+                    const n = Math.floor(Math.random() * length)
                     const luckEmbed = new Discord.MessageEmbed()
                     .setColor('#C64600')
                     .setTitle(random === 0 ? `TRUTH!` : `DARE!`)
