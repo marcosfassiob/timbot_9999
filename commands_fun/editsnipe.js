@@ -22,8 +22,8 @@ module.exports = {
         .setAuthor(`Dear ${msg.author.user.username},`, msg.author.user.displayAvatarURL())
         .setTitle("You really thought you could get away with that?")
         .addFields(
-            { name: "Original message:", value: msg.oldContent, inline: true },
-            { name: "Edited message:", value: msg.newContent, inline: true }
+            { name: "Original message:", value: msg.oldContent || msg.newImage, inline: true },
+            { name: "Edited message:", value: msg.newContent || msg.newImage, inline: true }
         )
         .setFooter("get fucked lol")
 

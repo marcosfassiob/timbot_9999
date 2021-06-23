@@ -5,7 +5,7 @@ const mongoose = require('mongoose')
 
 require('dotenv').config();
 
-const client = new Discord.Client({ disableEveryone: true });
+const client = new Discord.Client({ disableMentions: 'everyone' });
 const config = require('./config.json');
 client.config = config;
 client.commands = new Discord.Collection();

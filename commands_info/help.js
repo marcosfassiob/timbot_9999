@@ -86,7 +86,7 @@ module.exports = {
             message.channel.send(embed5)
         }
         
-        if (!args[0] && message.content.startsWith(`${result.prefix}help`) || message.content === `${prefix}`) help()
+        if (!args[0] && message.content.startsWith(`${prefix}help`) || message.content === `${prefix}`) help()
         else if (!message.content.startsWith(`${prefix}help`)) helpPrompt()
         else if (!client.commands.has(args[0]) && !client.commands.find(a => a.aliases && a.aliases.includes(args[0].toLowerCase()))) {
             return message.reply(`\`${args.join(' ')}\` is not a valid command.`)

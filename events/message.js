@@ -65,7 +65,6 @@ module.exports = (client, Discord) => {
 
         //set up everything for commands
         const prefix = guildPrefixes[message.guild.id] || process.env.PREFIX
-        if (message.content.startsWith('t.') && 't.' !== prefix) return message.reply(`the server prefix is \`${prefix}\``)
         if (!message.content.toLowerCase().startsWith(prefix)) return;
         
         const args = message.content.slice(prefix.length).trim().split(/ +/);
@@ -76,10 +75,7 @@ module.exports = (client, Discord) => {
         try {
             command.execute(client, message, args, Discord);
         } catch (err) {
-            if (err.message !== 'Cannot read property \'execute\' of undefined') {
-                console.log(err);
-                message.reply( "there was an issue executing that statement." + "```js\n" + err + "```");
-            }
+            console.log(err);
         } finally {
             let num = Math.floor(Math.random() * 20);
             if (message.guild.id !== '778461267999588363' 

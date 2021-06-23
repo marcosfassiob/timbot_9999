@@ -1,5 +1,5 @@
 module.exports = {
-    name: 'random',
+    name: 'coinflip',
     aliases: [
         'coinflip', 
         'flip',

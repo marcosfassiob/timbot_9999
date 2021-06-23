@@ -24,126 +24,304 @@ module.exports = {
     perms: ["MANAGE_ROLES"],
     execute(client, message, args, Discord) {
 
-        const logs = message.guild.channels.cache.find(c => c.name.includes('timbot-logs'));
-        const member = message.mentions.members.first() 
-        || message.guild.members.cache.get(args[1])
-        || message.member;
-
-        const roleInput = message.guild.roles.cache.find(r => r.name.toLowerCase().includes(args.slice(1).join(' ')))
-        || message.guild.roles.cache.find(r => r.name.toLowerCase().includes(args.slice(2).join(' ')))
-        || message.mentions.roles.first()
-        || message.mentions.roles.first(1)
-        || message.guild.roles.cache.get(args[1])
-        || message.guild.roles.cache.get(args[2]);   
-        if (roleInput.name === '@everyone') return message.reply("I couldn't find that role.");
-        
-        const embed = new Discord.MessageEmbed()
-        .setColor(roleInput.color || "#861F41")
-        .setTitle(`${(args[0] === 'add') ? 'Added' : 'Removed'} role ${roleInput.name} ${(args[0] === 'add') ? 'to' : 'from'} ${member.user.tag}`)
-        .setTimestamp()  
-
-        //send to logs if role added or removed
-        const embed3 = new Discord.MessageEmbed()
-        .setColor('#861F41')
-        .setAuthor(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
-        .setTitle(`Role ${(args[0] === 'add') ? "added" : "removed"}`)
-        .setDescription(`**Role: **${roleInput}\n**Given to: **${member.user}\n**Channel: **${message.channel}`)
-        .setTimestamp()
-
-        //send to logs if role deleted
-        const embed4 = new Discord.MessageEmbed()
-        .setColor('#861F41')
-        .setAuthor(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
-        .setTitle(`Role deleted`)
-        .setDescription(`**Role: **${roleInput.name}\n**Channel: **${message.channel}`)
-        .setTimestamp()
-
-        function addRole() {
-            if (member.roles.cache.some(r => r === roleInput)) return message.channel.send(`**${member.user.tag}** already has that role.`)
-            else (member.roles.add(roleInput.id))
-                .then(() => {
-                    message.channel.send(embed)
-                    logs.send(embed3)
-                }, e => {
-                    console.log(e)
-                    if (e instanceof DiscordAPIError) return message.reply(`I couldn't add that role.`)
-                    if (e instanceof TypeError) return message.reply(`I couldn't find that role.`)
-                })
-        }
-
-        function removeRole() {
-            if (!member.roles.cache.some(r => r === roleInput)) return message.channel.send(`**${member.user.tag}** already does not have that role.`)
-            else member.roles.remove(roleInput.id)
-                .then(() => {
-                    message.channel.send(embed)
-                    logs.send(embed3)
-                }, e => {
-                    console.log(e.stack)
-                    if (e instanceof DiscordAPIError) return message.reply(`I couldn't remove that role.`)
-                    if (e instanceof TypeError) return message.reply(`I couldn't find that role.`)
-                })
-        }
-
-        function createRole() {
-            let str = args.slice(1).join(' ')
-            message.guild.roles.create({
-                data: {
-                    name: str.match(/(?:"[^"]*"|^[^"]*$)/)[0].replace(/"/g, ""),
-                    color: (str.endsWith('"')) ? "DEFAULT" : args.pop().toUpperCase()
-                }
-            }).then((r) => {
-                const embed2 = new Discord.MessageEmbed()
-                .setColor(r.color || "#861F41")
-                .setTitle(`${(args[0] === 'create') ? 'Created' : 'Deleted'} new role: ${r.name}`)
-                .setTimestamp()
-
-                const embed5 = new Discord.MessageEmbed()
-                .setColor('#861F41')
-                .setAuthor(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
-                .setTitle(`Role created`)
-                .setDescription(`**Role: **${r}\n**Channel: **${message.channel}`)
-                .setTimestamp()
-
-                message.channel.send(embed2)
-                    .then(() => { 
-                        logs.send(embed5) 
-                    }, e => console.log(e.stack));
-
-            }, e => {
-                console.log(e.stack)
-            })
-        }     
-        
-        function deleteRole() {
-            roleInput.delete()
-                .then(() => {
-                    embed.setTitle(`Deleted role: ${roleInput.name}`)
-                    message.channel.send(embed)
-                        .then(() => {
-                            logs.send(embed4)
-                        }, e => console.log(e.stack))
-                }, e => {
-                    console.log(e)
-                    if (e instanceof DiscordAPIError) return message.reply(`I couldn't remove that role.`)
-                    if (e instanceof TypeError) return message.reply(`I couldn't find that role.`)
-                })
-        }
-
-        //main
         if (!args[0]) return client.commands.get('help').execute(client, message, args, Discord);
-        if (!message.member.hasPermission(this.perms)) return message.channel.send(`Missing perms: \`${this.perms}\``);
-        if (!message.guild.me.hasPermission(this.perms)) return message.channel.send(`I\`m missing perms: \`${this.perms}\``);
-        if (!args[1]) return message.reply('please mention or type a role!');
+        const { guild, mentions, channel, member, author } = message;
+        const logs = guild.channels.cache.find(channel => channel.name.includes('timbot-logs'));
+
+        const modifyRole = guild.roles.cache.find(role => role.name.toLowerCase().startsWith(args.slice(1).join(' ')))
+        || mentions.roles.first()
+        || guild.roles.cache.get(args[1]) 
+
+        /**
+         * Adds a role to a member
+         * @param {Snowflake} target 
+         * @param {String} role 
+         */
+        async function add_role(target, role) {
+            const error_embed = new Discord.MessageEmbed().setColor('861F41');
+            try { //try fetching target
+                target = mentions.members.first() || await guild.members.fetch(target);
+            } catch (err) {
+                console.log(err)
+                if (err instanceof DiscordAPIError) {
+                    error_embed.setTitle(`I couldn't find that user.`)
+                    if (err.code === 10013 || err.code === 0 || err.code === 50035) { //unknown user || 404 not found || not snowflake
+                        error_embed.setDescription(`Please make sure you mentioned that user or entered their user ID.`);
+                    } else {
+                        error_embed.setDescription(`\`\`\`js\n${err}\nPlease report this using the reportbug command.\`\`\``);
+                    }
+                } else {
+                    error_embed.setTitle(`I couldn't execute that statement.`)
+                    error_embed.setDescription(`\`\`\`js\n${err}\nPlease report this using the reportbug command.\`\`\``);
+                }
+                return channel.send(error_embed);
+            }
+
+            try {
+                role = mentions.roles.first()
+                || guild.roles.cache.find(r => r.name.toLowerCase().startsWith(role))
+                || await guild.roles.fetch(role);
+                if (role == undefined || role.name  === '@everyone') throw new TypeError('Cannot read property');
+            } catch (err) {
+                console.log(err)
+                if (err instanceof TypeError) {
+                    error_embed.setTitle(`I couldn't find that role.`);
+                    if (err.message.startsWith('Cannot read property')) {
+                        error_embed.setDescription(`Was there a typo?`);
+                    } else {
+                        error_embed.setDescription(`\`\`\`js\n${err}\nPlease report this using the reportbug command.\`\`\``);
+                    }
+                } else {
+                    error_embed.setTitle(`I couldn't execute that statement.`);
+                    error_embed.setDescription(`\`\`\`js\n${err}\nPlease report this using the reportbug command.\`\`\``);
+                }
+                return channel.send(error_embed);             
+            }
+
+            const role_embed = new Discord.MessageEmbed()
+            .setColor(role.color || "#861F41")
+            .setTitle(`Added role "${role.name}" to ${target.user.tag}`)
+
+            const logs_embed = new Discord.MessageEmbed()
+            .setColor('#861F41')
+            .setAuthor(`${author.tag} added role`, author.avatarURL({ dynamic: true }))
+            .setDescription(`**Role: **${role}\n**Given to: **${target.user}\n**Channel: **${channel}`)
+            .setTimestamp()
+
+            if (target.roles.cache.some(r => r === role)) {
+                error_embed.setTitle(`I couldn't add that role`);
+                error_embed.setDescription(`**${target.user.tag}** already has that role.`);
+                return channel.send(error_embed);
+            } else {
+                target.roles.add(role).then(() => {
+                    try {
+                        channel.send(role_embed);
+                        logs.send(logs_embed);
+                    } catch (err) {
+                        console.log(err);
+                    }
+                }, err => {
+                    console.log(err);
+                    if (err instanceof DiscordAPIError) {
+                        error_embed.setTitle(`I couldn't add that role.`);
+                        if (err.code === 50013) { //missing perms
+                            error_embed.setDescription(`Please make sure my role is higher than that role.`);
+                        } else {
+                            error_embed.setDescription(`\`\`\`js\n${err}\nPlease report this using the reportbug command.\`\`\``);
+                        }
+                    } else {
+                        error_embed.setTitle(`I couldn't execute that statement.`);
+                        error_embed.setDescription(`\`\`\`js\n${err}\nPlease report this using the reportbug command.\`\`\``);
+                    }
+                    return channel.send(error_embed);
+                })
+            }           
+        }
+
+        /**
+         * Removes a role from a user.
+         * @param {Snowflake} target 
+         * @param {String} role 
+         */
+        async function remove_role(target, role) {
+            const error_embed = new Discord.MessageEmbed().setColor('861F41');
+            try { //try fetching target
+                target = mentions.members.first() || await guild.members.fetch(target);
+            } catch (err) {
+                console.log(err)
+                if (err instanceof DiscordAPIError) {
+                    error_embed.setTitle(`I couldn't find that user.`)
+                    if (err.code === 10013 || err.code === 0 || err.code === 50035) { //unknown user || 404 not found || not snowflake
+                        error_embed.setDescription(`Please make sure you mentioned that user or entered their user ID.`);
+                    } else {
+                        error_embed.setDescription(`\`\`\`js\n${err}\nPlease report this using the reportbug command.\`\`\``);
+                    }
+                } else {
+                    error_embed.setTitle(`I couldn't execute that statement.`)
+                    error_embed.setDescription(`\`\`\`js\n${err}\nPlease report this using the reportbug command.\`\`\``);
+                }
+                return channel.send(error_embed);
+            }
+
+            try {
+                role = mentions.roles.first()
+                || guild.roles.cache.find(r => r.name.toLowerCase().startsWith(role))
+                || await guild.roles.fetch(role);
+                if (role == undefined || role.name  === '@everyone') throw new TypeError('Cannot read property');
+            } catch (err) {
+                console.log(err)
+                if (err instanceof TypeError) {
+                    error_embed.setTitle(`I couldn't find that role.`);
+                    if (err.message.startsWith('Cannot read property')) {
+                        error_embed.setDescription(`Was there a typo?`);
+                    } else {
+                        error_embed.setDescription(`\`\`\`js\n${err}\nPlease report this using the reportbug command.\`\`\``);
+                    }
+                } else {
+                    error_embed.setTitle(`I couldn't execute that statement.`);
+                    error_embed.setDescription(`\`\`\`js\n${err}\nPlease report this using the reportbug command.\`\`\``);
+                }
+                return channel.send(error_embed);             
+            }
+
+            const role_embed = new Discord.MessageEmbed()
+            .setColor(role.color || "#861F41")
+            .setTitle(`Removed role "${role.name}" from ${target.user.tag}`)
+
+            const logs_embed = new Discord.MessageEmbed()
+            .setColor('#861F41')
+            .setAuthor(`${author.tag} removed role`, author.avatarURL({ dynamic: true }))
+            .setDescription(`**Role: **${role}\n**Given to: **${target.user}\n**Channel: **${channel}`)
+            .setTimestamp()
+
+            if (!target.roles.cache.some(r => r === role)) {
+                error_embed.setTitle(`I couldn't remove that role.`);
+                error_embed.setDescription(`**${target.user.tag}** does not have that role.`);
+                return channel.send(error_embed);
+            } else {
+                target.roles.remove(role).then(() => {
+                    try {
+                        channel.send(role_embed);
+                        logs.send(logs_embed);
+                    } catch (err) {
+                        console.log(err);
+                    }
+                }, err => {
+                    console.log(err);
+                    if (err instanceof DiscordAPIError) {
+                        error_embed.setTitle(`I couldn't remove that role.`);
+                        if (err.code === 50013) { //missing perms
+                            error_embed.setDescription(`Please make sure my role is higher than that role.`);
+                        } else {
+                            error_embed.setDescription(`\`\`\`js\n${err}\nPlease report this using the reportbug command.\`\`\``);
+                        }
+                    } else {
+                        error_embed.setTitle(`I couldn't execute that statement.`);
+                        error_embed.setDescription(`\`\`\`js\n${err}\nPlease report this using the reportbug command.\`\`\``);
+                    }
+                    return channel.send(error_embed);
+                })
+            }
+        }
+
+        /**
+         * Creates a role.
+         * @param {String} name 
+         * @param {String} color 
+         */
+        async function create_role(name, color) {
+            const error_embed = new Discord.MessageEmbed().setColor('861F41');
+            guild.roles.create({
+                data: {
+                    name: name.match(/(?:"[^"]*"|^[^"]*$)/)[0].replace(/"/g, ""),
+                    color: color
+                }
+            }).then(role => {
+                const role_embed = new Discord.MessageEmbed()
+                .setColor(role.color || "#861F41")
+                .setTitle(`Role ${role.name} created`)
+
+                const logs_embed = new Discord.MessageEmbed()
+                .setColor('#861F41')
+                .setAuthor(`${author.tag} created role`, author.avatarURL({ dynamic: true }))
+                .setDescription(`**Role: **${role}\n**Channel: **${channel}`)
+                .setTimestamp()
+
+                try {
+                    channel.send(role_embed);
+                    logs.send(logs_embed);
+                } catch (err) {
+                    console.log(err);
+                }
+            }, err => {
+                console.log(err);
+                error_embed.setTitle(`I couldn't create this role.`);
+                error_embed.setDescription(`\`\`\`js\n${err}\nPlease report this using the reportbug command.\`\`\``);
+                return channel.send(error_embed);
+            })
+        }    
+        
+        /**
+         * Deletes a role.
+         * @param {String} role 
+         */
+        async function delete_role(role) {
+            try {
+                role = mentions.roles.first()
+                || guild.roles.cache.find(r => r.name.toLowerCase().startsWith(role))
+                || await guild.roles.fetch(role);
+                if (role == undefined || role.name  === '@everyone') throw new TypeError('Cannot read property');
+            } catch (err) {
+                console.log(err)
+                if (err instanceof TypeError) {
+                    error_embed.setTitle(`I couldn't find that role.`);
+                    if (err.message.startsWith('Cannot read property')) {
+                        error_embed.setDescription(`Was there a typo?`);
+                    } else {
+                        error_embed.setDescription(`\`\`\`js\n${err}\nPlease report this using the reportbug command.\`\`\``);
+                    }
+                } else {
+                    error_embed.setTitle(`I couldn't execute that statement.`);
+                    error_embed.setDescription(`\`\`\`js\n${err}\nPlease report this using the reportbug command.\`\`\``);
+                }
+                return channel.send(error_embed);
+            }
+
+            const role_embed = new Discord.MessageEmbed()
+            .setColor(role.color || "#861F41")
+            .setTitle(`Role "${role.name}" deleted`)
+
+            const logs_embed = new Discord.MessageEmbed()
+            .setColor('#861F41')
+            .setAuthor(`${author.tag} deleted role`, author.avatarURL({ dynamic: true }))
+            .setDescription(`**Role: **${role.name}\n**Channel: **${channel}`)
+            .setTimestamp()
+
+            role.delete().then(() => {
+                try {
+                    channel.send(role_embed);
+                    logs.send(logs_embed);
+                } catch (err) {
+                    console.log(err);
+                }
+            }, err => {
+                console.log(err)
+                if (err instanceof DiscordAPIError) {
+                    embed1.setTitle(`I couldn't delete that role.`);
+                    if (err.code === 50013) { //missing perms
+                        embed1.setDescription(`Make sure my role is higher than said role!`);
+                    } else {
+                        error_embed.setDescription(`\`\`\`js\n${err}\nPlease report this using the reportbug command.\`\`\``);
+                        error_embed.setFooter(`Please report this using "reportbug <message>"`);
+                    }
+                } else {
+                    error_embed.setTitle(`I couldn't find that role.`)
+                    error_embed.setDescription(`Make sure you haven't misspelled anything!`)
+                }
+                return channel.send(embed1)
+            })
+        }
+        
+        //main
+        const perms_embed = new Discord.MessageEmbed()
+        .setColor('861F41')
+        .setTitle(`Missing permissions`);
+        if (!member.hasPermission(this.perms)) {
+            perms_embed.setDescription(`You lack the permissions to use this command.`)
+            return channel.send(perms_embed)
+        } else if (!guild.me.hasPermission(this.perms)) {
+            perms_embed.setDescription(`I don't have the permission \`${this.perms}\` to execute this command.`)
+            return channel.send(perms_embed)
+        }
         
         if (args[0] === 'add') {
-            addRole();
+            add_role(args[1], args[2]);
         } else if (args[0] === 'remove') {
-            removeRole();
+            remove_role(args[1], args[2]);
         } else if (args[0] === 'create') {
-            createRole();
+            create_role(args.slice(1).join(' '), args.pop().toUpperCase() || "DEFAULT");
         } else if (args[0] === 'delete') {
-            deleteRole();
-        } else return message.reply('please type `add` or `remove` or `create` if you want to add/remove a role.');
-
+            delete_role(args.slice(1).join(' '));
+        } else return message.reply(`please type one of the four following subcommands: \`add\`, \`remove\`, \`create\`, \`delete\`.`);
     }
 }

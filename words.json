@@ -1,8 +1,11 @@
 {
     "commandPrompts":
     [
-        "**TIP:** Have a bug you want to report? Type `t.reportbug` and send us a bug report.",
-        "**TIP:** Want to suggest something for TimBot? Type `t.suggest` and suggest us something!",
+        "**TIP:** Have a bug you want to report? Type `t.reportbug <bug>` and send us a bug report.",
+        "**TIP:** Want to suggest something for TimBot? Type `t.suggest <suggestion>` and suggest us something!",
+        "**TIP:** Are you not seeing any audit logs from TimBot 9999? Make sure you set a channel name to `timbot-logs` to receive logs from me. (the converse applies too)",
+        "**TIP:** There are a ton of subcommands for each command. Type `t.help <command>` for whichever command you're interested in.",
+        "This bot will always have bugs and errors. If you ever catch one (most likely when finding code block responses from me), please report it using `t.reportbug`.",
         "**SHAMELESS PLUG:** Interested in TimBot and want to be the first to receive updates? Join our Discord server: https://discord.gg/q439qazkT5"
     ],
 

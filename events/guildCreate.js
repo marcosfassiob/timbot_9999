@@ -39,7 +39,7 @@ module.exports = (client, Discord) => {
         const embed1 = new Discord.MessageEmbed()
         .setColor("#E87722")
         .setTitle("Thank you for adding TimBot 9999!")
-        .setDescription("If you need to report any bugs, just type `t.reportbug <description>` and I'll do my best to fix that bug!")
+        .setDescription("If you find any bugs, just type `t.reportbug <description>` and I'll do my best to fix that bug!")
         .addFields(
             { name: "This bot includes:", value: "• Built-in chat filter\n• Proper moderation and audit logging\n• Cute little mini-commands"}
         )

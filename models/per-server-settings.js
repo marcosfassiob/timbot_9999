@@ -25,8 +25,7 @@ module.exports = (client) => {
                         guild.fetchInvites().then((invites) => {
                             for (const invite of invites) {
                                 if (code === invite[0]) {
-                                    resolve(true);
-                                    return;
+                                    return resolve(true);
                                 }
                             }
                             resolve(false)

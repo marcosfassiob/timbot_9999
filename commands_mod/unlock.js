@@ -11,39 +11,76 @@ module.exports = {
     perms: ["MANAGE_CHANNELS"],
     async execute(client, message, args, Discord) {
 
-        let lockdown = false
-        const everyone = message.channel.guild.roles.everyone
-        const logs = message.guild.channels.cache.find((channel) => channel.name.includes('timbot-logs'))
+        const { guild, member, channel, author } = message;
+        const everyone = channel.guild.roles.everyone
+        const logs = guild.channels.cache.find(channel => channel.name.includes('timbot-logs'))
 
-        if (!message.member.hasPermission(this.perms)) return message.reply("You don't have the perms to execute this command!")
-        if (!message.guild.me.hasPermission(this.perms)) return message.reply("I don't have the perms to execute this command! Type `t.help unlock` for all the perms I need.")
+        /**
+         * Unlocks the channel the message is sent in
+         */
+        function unlock_channel() {
+            channel.updateOverwrite(everyone, { "SEND_MESSAGES": null }).catch(err => console.log(err));
+            const embed1 = new Discord.MessageEmbed()
+            .setColor("#861F41")
+            .setTitle(`Unlocked #${channel.name}`)
+           
+            //send to logs
+            const embed2 = new Discord.MessageEmbed()
+            .setAuthor(`${author.tag} unlocked channel`, author.displayAvatarURL({ dynamic: true }))
+            .setColor("#861F41")
+            .setDescription(`**Channel unlocked: ** ${channel}`)
+            .setTimestamp()
 
-        if (args[0] === 'all') {
-            message.guild.channels.cache.forEach(c => c.updateOverwrite(everyone, { "SEND_MESSAGES": null }))
-            lockdown = true
+            channel.send(embed1)
+            logs.send(embed2).catch(err => console.log(err))
         }
-        else {
-            message.channel.updateOverwrite(everyone, { "SEND_MESSAGES": null })
+
+        /**
+         * Unlocks all channels
+         */
+        function unlock_all() {
+            try {
+                guild.channels.cache.forEach(channel => {
+                    channel.updateOverwrite(everyone, { "SEND_MESSAGES": null });
+                })
+            } catch (err) {
+                console.log(err);
+            }
+
+            const embed1 = new Discord.MessageEmbed()
+            .setColor("#861F41")
+            .setTitle("Unlocked all channels")
+           
+            //send to logs
+            const embed2 = new Discord.MessageEmbed()
+            .setAuthor(`${author.tag} unlocked all channels`, author.displayAvatarURL({ dynamic: true }))
+            .setColor("#861F41")
+            .setDescription(`**Guild unlocked: ** ${guild.name}`)
+            .setTimestamp()
+
+            try {
+                channel.send(embed1);
+                logs.send(embed2);
+            } catch (err) {
+                console.log(err);
+            }
+        }
+        
+        const perms_embed = new Discord.MessageEmbed()
+        .setColor('861F41')
+        .setTitle(`Missing permissions`);
+        if (!member.hasPermission(this.perms)) {
+            perms_embed.setDescription(`You lack the permissions to use this command.`)
+            return channel.send(perms_embed)
+        } else if (!guild.me.hasPermission(this.perms)) {
+            perms_embed.setDescription(`I don't have the permission \`${this.perms}\` to execute this command.`)
+            return channel.send(perms_embed)
         }
 
-        const embed1 = new Discord.MessageEmbed()
-        .setColor("#861F41")
-        .setTitle((lockdown) ? "Unlocked all channels" : `Unlocked #${message.channel.name}`)
-        .setTimestamp()
-       
-        //send to logs
-        const embed2 = new Discord.MessageEmbed()
-        .setAuthor(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
-        .setColor("#861F41")
-        .setTitle("Channel unlocked")
-        .setDescription(`**Channel/guild unlocked: ** ${(lockdown) ? message.guild.name : message.channel}`)
-        .setTimestamp()
-
-        message.channel.send(embed1)
-            .then(() => {
-                logs.send(embed2)
-            }, err => {
-                console.log(err.stack)
-            })
+        if (args[0].toLowerCase() === 'all') {
+            unlock_all();
+        } else {
+            unlock_channel();
+        }
     }
 }

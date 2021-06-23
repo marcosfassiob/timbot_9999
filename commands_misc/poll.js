@@ -7,9 +7,6 @@ module.exports = {
     perms: ['MANAGE_MESSAGES'],
     execute(client, message, args, Discord) {
         if (!args[0]) return client.commands.get('help').execute(client, message, args, Discord);
-        if (!message.member.hasPermission(this.perms)) return message.channel.send(`${message.author} Missing perms: ${this.perms}`);
-        if (!message.guild.me.hasPermission(this.perms)) return message.channel.send(`${message.author} I'm missing perms: ${this.perms}`);
-
         const array = args.toString().match(/(?:"[^"]*"|^[^"]*$)/g).map(str => str.replace(/,/g, ' ').replace(/"/g, ''));
         const digits = ['0⃣', '1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '🔟'];
         let description = [];

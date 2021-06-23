@@ -18,69 +18,178 @@ module.exports = {
     perms: ["BAN_MEMBERS"],
     execute(client, message, args, Discord) {
 
-        const member = message.mentions.members.first() || message.guild.members.cache.get(args[0])
-        const logs = message.guild.channels.cache.find((channel) => channel.name.includes('timbot-logs'))
-        let ghostBanned = false
-        let reason;
+        if (!args[0]) return client.commands.get('help').execute(client, message, args, Discord);
+        const { member, guild, channel, mentions, author } = message;
+        const logs = guild.channels.cache.find(channel => channel.name.includes('timbot-logs'));
 
-        if (!args[0] || !member) return client.commands.get('help').execute(client, message, args, Discord)
-        if (!message.member.hasPermission(this.perms)) return message.channel.send(`Missing perms: \`${this.perms}\``)
-        if (!message.guild.me.hasPermission(this.perms)) return message.channel.send(`I\`m missing perms: \`${this.perms}\``)
-        if (!member) return message.reply("please specify who you want to ban!")
-        if (member.id === message.member.id) return message.channel.send(`Why are you trying to ban yourself?`)
+        /**
+         * Bans a member.
+         * @param {Snowflake} target 
+         * @param {String} reason 
+         */
+        async function ban_user(target, reason) {
+            const error_embed = new Discord.MessageEmbed().setColor('861F41');
+            try { //try fetching target
+                target = mentions.users.first() || await client.users.fetch(target);
+            } catch (err) {
+                console.log(err)
+                if (err instanceof DiscordAPIError) {
+                    error_embed.setTitle(`I couldn't find that user.`)
+                    if (err.code === 10013 || err.code === 0 || err.code === 50035) { //unknown user || 404 not found || not snowflake
+                        error_embed.setDescription(`Please make sure you mentioned that user or entered their user ID.`);
+                    } else {
+                        error_embed.setDescription(`\`\`\`js\n${err}\n\`\`\``);
+                    }
+                } else {
+                    error_embed.setTitle(`I couldn't execute that statement.`)
+                    error_embed.setDescription(`\`\`\`js\n${err}\n\`\`\``);
+                }
+                return channel.send(error_embed);
+            }
 
-        for (perm of adminPerms) {
-            if (member.hasPermission(perm)) return message.reply(`**${member.user.tag}** cannot be banned.`)
-        }
+            if (guild.member(target)) { //if target is in server
+                for (const perm of adminPerms) {
+                    if (guild.member(target).hasPermission(perm)) {
+                        const embed1 = new Discord.MessageEmbed()
+                        .setColor('861F41')
+                        .setTitle(`I couldn't ban that user.`)
+                        .setDescription(`**${target.tag}** is immune to bans.`)
+                        return channel.send(embed1)
+                    }
+                }
+            }
 
-        //ban embed
-        const embed1 = new Discord.MessageEmbed()
-        .setColor("#861F41")
-        .setTitle(`${member.user.tag} has been banned`)
-        .setTimestamp()
+            const logs_embed = new Discord.MessageEmbed()
+            .setColor('861F41')
+            .setAuthor(`${author.tag} banned member`, author.avatarURL({ dynamic: true }))
+            .setDescription(`**Channel: **${channel}\n**Member: **${target}\n**Reason: **${reason}`)
+            .setTimestamp();
+            const ban_embed = new Discord.MessageEmbed()
+            .setColor('861F41')
+            .setTitle(`Banned ${target.tag}`);
 
-        const ban = () => {
-            member.send(`You've been banned for: **${reason}**`)
-                .catch(err => {
-                    console.log(err);
-                    if (err instanceof DiscordAPIError) embed1.setFooter('Couldn\'t DM user, ban logged.');
-                })
-                .then(() => {
-                    member.ban();
-                    message.channel.send(embed1).then(logs.send(embed2));
+            try {
+                if (guild.member(target)) await target.send(`You've been banned from **${guild.name}** for: **${reason}**`);
+            } catch (err) {
+                console.log(err);
+                if (err instanceof DiscordAPIError) {
+                    if (err.code === 50007) { //cannot send messages to user
+                        ban_embed.setFooter(`Couldn't DM user, ban logged.`);
+                    } else {
+                        ban_embed.setDescription(`\`\`\`js\n${err}\nPlease report this using the report command\n\`\`\``)
+                    }
+                } else {
+                    ban_embed.setDescription(`\`\`\`js\n${err}\nPlease report this using the report command\n\`\`\``)
+                }
+            } finally {
+                guild.members.ban(target, { reason: reason }).then(() => {
+                    try {
+                        channel.send(ban_embed);
+                        logs.send(logs_embed)
+                    } catch (err) {
+                        console.log(err)
+                    }
                 }, err => {
-                   console.log(err);
-                });
-        }
-
-        const ghostBan = () => {
-            member.ban()
-                .then(() => {
-                    ghostBanned = true
-                    message.channel.send(embed1).then(logs.send(embed2));
-                }, err => {
                     console.log(err);
+                    if (err instanceof DiscordAPIError) {
+                        error_embed.setTitle(`I couldn't ban that member.`);
+                        if (err.code === 50013) { //missing perms
+                            error_embed.setDescription(`Make sure my role is higher than that member's roles.`);
+                        } else {
+                            error_embed.setDescription(`\`\`\`js\n${err}\nPlease report this using the reportbug command.\n\`\`\``)
+                        } 
+                    } else {
+                        error_embed.setDescription(`\`\`\`js\n${err}\nPlease report this using the reportbug command.\n\`\`\``)
+                    }
+                    return channel.send(error_embed);
                 })
+            }
+        }
+        
+        /**
+         * Bans a member without DMing them.
+         * @param {Snowflake} target 
+         * @param {String} reason 
+         */
+        async function ghostban_user(target, reason) {
+            const error_embed = new Discord.MessageEmbed().setColor('861F41');
+            try { //try fetching target
+                target = mentions.users.first() || await client.users.fetch(target);
+            } catch (err) {
+                console.log(err)
+                if (err instanceof DiscordAPIError) {
+                    error_embed.setTitle(`I couldn't find that user.`)
+                    if (err.code === 10013 || err.code === 0 || err.code === 50035) { //unknown user || 404 not found || not snowflake
+                        error_embed.setDescription(`Please make sure you mentioned that user or entered their user ID.`);
+                    } else {
+                        error_embed.setDescription(`\`\`\`js\n${err}\n\`\`\``);
+                    }
+                } else {
+                    error_embed.setTitle(`I couldn't execute that statement.`)
+                    error_embed.setDescription(`\`\`\`js\n${err}\n\`\`\``);
+                }
+                return channel.send(error_embed);
+            }
+
+            if (guild.member(target)) { //if target is in server
+                for (const perm of adminPerms) {
+                    if (guild.member(target).hasPermission(perm)) {
+                        const embed1 = new Discord.MessageEmbed()
+                        .setColor('861F41')
+                        .setTitle(`I couldn't ban that user.`)
+                        .setDescription(`**${target.tag}** is immune to bans.`)
+                        return channel.send(embed1)
+                    }
+                }
+            }
+            
+            const logs_embed = new Discord.MessageEmbed()
+            .setColor('861F41')
+            .setAuthor(`${author.tag} ghost banned member`, author.avatarURL({ dynamic: true }))
+            .setDescription(`**Channel: **${channel}\n**Member: **${target}\n**Reason: **${reason}`)
+            .setTimestamp();
+            const ban_embed = new Discord.MessageEmbed()
+            .setColor('861F41')
+            .setTitle(`Banned ${target.tag}`);
+
+            guild.members.ban(target, { reason: reason }).then(() => {
+                channel.send(ban_embed); 
+                try {
+                    logs.send(logs_embed);
+                } catch (err) {
+                    console.log(err);
+                }
+            }, err => {
+                console.log(err);
+                    if (err instanceof DiscordAPIError) {
+                        error_embed.setTitle(`I couldn't ban that member.`);
+                        if (err.code === 50013) { //missing perms
+                            error_embed.setDescription(`Make sure my role is higher than that member's roles.`);
+                        } else {
+                            error_embed.setDescription(`\`\`\`js\n${err}\nPlease report this using the reportbug command.\n\`\`\``)
+                        } 
+                    } else {
+                        error_embed.setDescription(`\`\`\`js\n${err}\nPlease report this using the reportbug command.\n\`\`\``)
+                    }
+                return channel.send(error_embed);
+            })
         }
 
-        //--- FUNCTION MAIN ---//
+        const perms_embed = new Discord.MessageEmbed()
+        .setColor('861F41')
+        .setTitle(`Missing permissions`);
+        if (!member.hasPermission(this.perms)) {
+            perms_embed.setDescription(`You lack the permissions to use this command.`)
+            return channel.send(perms_embed)
+        } else if (!guild.me.hasPermission(this.perms)) {
+            perms_embed.setDescription(`I don't have the permission \`${this.perms}\` to execute this command.`)
+            return channel.send(perms_embed)
+        }
     
         if (args[0].toLowerCase() === 'ghost') {
-            if (!args[2]) reason = "No reason given"
-            else reason = args.slice(2).join(' ')
-            ghostban()
+            ghostban_user(args[1], args.slice(2).join(' ') || "No reason given");
         } else {
-            if (!args[1]) reason = "No reason given"
-            else reason = args.slice(1).join(' ')
-            ban()
+            ban_user(args[0], args.slice(1).join(' ') || "No reason given");
         }
-
-        //send to logs
-        const embed2 = new Discord.MessageEmbed()
-        .setAuthor(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
-        .setColor("#861F41")
-        .setTitle(`Member ${(ghostBanned) ? 'ghostbanned' : 'banned'}`)
-        .setDescription(`**Member: ** ${member.user}\n**Channel: ** ${message.channel}\n**Reason: ** ${reason}`)
-        .setTimestamp()
     }
 }

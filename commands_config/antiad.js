@@ -18,6 +18,7 @@ module.exports = {
     perms: ["ADMINISTRATOR"],
     async execute(client, message, args, Discord) {
 
+        const logs = message.guild.channels.cache.find(c => c.name.includes('timbot-logs') && c.type === 'text');
         if (!args[0]) return client.commands.get('help').execute(client, message, args, Discord)
         if (!message.guild.me.hasPermission(this.perms)) return message.reply(`I'm missing perms: \`${this.perms}\``)
         if (!message.member.hasPermission(this.perms)) return message.reply(`Missing perms: \`${this.perms}\``)
@@ -42,8 +43,12 @@ module.exports = {
                 const embed = new Discord.MessageEmbed()
                 .setColor("642667")
                 .setTitle(`${(prompt === 'enable') ? 'Enabled' : 'Disabled'} anti-ad. ${(prompt === 'enable') ? 'Nobody' : 'Anyone'} can send invite links now.`)
+                const embed2 = new Discord.MessageEmbed()
+                .setColor('642667')
+                .setAuthor(`${message.author.tag} ${(args[0] === 'enable') ? 'enabled' : 'disabled'} antiad`, message.author.avatarURL({ dynamic: true }))
+                .setDescription(`**Channel: **${message.channel}`)
                 .setTimestamp()
-                message.channel.send(embed)
+                message.channel.send(embed).then(logs.send(embed2))
             }
             antiadConfig(args[0])
         })

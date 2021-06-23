@@ -20,7 +20,7 @@ module.exports = {
         .setColor("#C64600")
         .setAuthor(`Dear ${msg.author.user.username},`, msg.author.user.displayAvatarURL())
         .setTitle("You really thought you could get away with that?")
-        .addField("Deleted message:", `${msg.content}`)
+        .addField("Deleted message:", `${msg.content}` || msg.image)
         .setFooter("get fucked lol")
 
         //send to logs

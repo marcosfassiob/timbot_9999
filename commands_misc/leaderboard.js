@@ -14,26 +14,26 @@ module.exports = {
     ],
     subcommands: [
         '**lb clear [@user]** - clears the leaderboard [or a user\'s stats]',
-        '**lb edit <@user> <level> [xp]** - work in progress'
+        '**lb edit <@user> <level> [xp]** - edit a user\'s stats'
     ],
     perms: "ADMINISTRATOR",
     async execute(client, message, args, Discord) {
+        const { member, guild, mentions, channel, author } = message;
 
         const yesEmoji = '✅';
         const noEmoji = '❌';
         const rightEmoji = '➡️';
         const leftEmoji = '⬅️';
 
-        const { member, guild } = message;
-        const target = message.mentions.members.first() || message.guild.members.cache.get(args[1]);
-        const logs = message.guild.channels.cache.find(c => c.name.includes('timbot-logs') && c.type === 'text');
+        const target = mentions.members.first() || guild.members.cache.get(args[1]);
+        const logs = guild.channels.cache.find(channel => channel.name.includes('timbot-logs') && channel.type === 'text');
 
         //MY GUILD ONLY
-        const regulars_role = message.guild.roles.cache.get('778478893451182140');
-        const active_role = message.guild.roles.cache.get('847730653466460160');
-        const super_active_role = message.guild.roles.cache.get('847730964619591701');
-        const hella_active_role = message.guild.roles.cache.get('853840133899026432');
-        const super_hella_active_role = message.guild.roles.cache.get('853840453748654121');
+        const regulars_role = guild.roles.cache.get('778478893451182140');
+        const active_role = guild.roles.cache.get('847730653466460160');
+        const super_active_role = guild.roles.cache.get('847730964619591701');
+        const hella_active_role = guild.roles.cache.get('853840133899026432');
+        const super_hella_active_role = guild.roles.cache.get('853840453748654121');
 
         const viewLeaderboard = async () => {
             await mongoose.connect(process.env.MONGO_URI, {
@@ -43,28 +43,26 @@ module.exports = {
             }).then(async () => {
                 try {
                     //set up leaderboards list
-                    const results = await levelSchema.find({ guildId: message.guild.id, level: { $gt: 0 } }, 'userId xp level -_id')
+                    const results = await levelSchema.find({ guildId: guild.id }, 'userId xp level -_id')
                     .sort('-level -xp')
                     .limit(50)
+ 
+                    //manipulate user ids to user tags
                     for (let i = 0; i < results.length; i++) {
                         try {
-                            if (guild.members.cache.get(results[i].userId) === undefined) {
-                                results.splice(i, 1);
-                            }
+                            results[i].userId = guild.members.cache.get(results[i].userId).user.tag;
                         } catch (err) {
-                            console.log(err)
                             if (err.message === 'Cannot read property \'user\' of undefined') {
-                                results.splice(i, 1)
+                                results[i].userId = 'unknown user';
                             }
                         }
-                        
                     }
                     const upper_limit = Math.ceil(results.length / 10)
                     let desc = []
 
                     for (let i = 0; i < 10; i++) {
                         try {
-                            desc.push(`${i + 1}. **${guild.members.cache.get(results[i].userId).user.tag}** (level ${results[i].level})`);
+                            desc.push(`${i + 1}. **${results[i].userId}** (level ${results[i].level})`);
                         } catch (err) {
                             if (err.message !== 'Cannot read property \'userId\' of undefined') {
                                 break;
@@ -74,12 +72,12 @@ module.exports = {
 
                     const embed = new Discord.MessageEmbed()
                     .setColor('#003C71')
-                    .setTitle(`Most active users in ${guild.name}:`)
+                    .setTitle(`Top 50 users in ${guild.name}:`)
                     .setDescription(desc)
                     .setThumbnail(guild.iconURL({ dynamic: true })) 
                     .setFooter(`Page 1 of ${upper_limit}`)   
 
-                    message.channel.send(embed).then(msg => {
+                    channel.send(embed).then(msg => {
                         msg.react(leftEmoji)
                         msg.react(rightEmoji)
                         let n = 0;
@@ -92,7 +90,7 @@ module.exports = {
                             let newDesc = [];
                             for (let i = 10 * n; i < (10 * n) + 10; i++) {
                                 try {
-                                    newDesc.push(`${i + 1}. **${guild.members.cache.get(results[i].userId).user.tag}** (level ${results[i].level})`);
+                                    newDesc.push(`${i + 1}. **${results[i].userId}** (level ${results[i].level})`);
                                 } catch (err) {
                                     if (err.message === 'Cannot read property \'userId\' of undefined') {
                                         results.splice(i, 1)
@@ -151,11 +149,11 @@ module.exports = {
             .setColor('003C71')
             .setTitle(`Are you sure you want to update ${member.user.tag}'s stats?`)
             .setDescription(`**New level: **${args[2]}\n**New xp: **${args[3] || 0} xp`)
-            message.channel.send(embed).then(msg => {
+            channel.send(embed).then(msg => {
                 msg.react(noEmoji);
                 msg.react(yesEmoji);
                 const filter = (reaction, user) => {
-                    return [yesEmoji, noEmoji].includes(reaction.emoji.name) && user.id === message.author.id;
+                    return [yesEmoji, noEmoji].includes(reaction.emoji.name) && user.id === author.id;
                 }
                 msg.awaitReactions(filter, { max: 1, time: 60 * 1000, errors: ['time'] }).then(async collected => {
                     const reaction = collected.first();
@@ -183,16 +181,15 @@ module.exports = {
         }
 
         const clearLeaderboard = async () => {
-
             const embed = new Discord.MessageEmbed()
             .setColor('#003C71')
             .setTitle('Are you sure? This will reset everyone\'s xp.');
 
-            message.channel.send(embed).then(msg => {
+            channel.send(embed).then(msg => {
                 msg.react(yesEmoji)
                 msg.react(noEmoji)
                 const filter = (reaction, user) => {
-                    return [yesEmoji, noEmoji].includes(reaction.emoji.name) && user.id === message.author.id;
+                    return [yesEmoji, noEmoji].includes(reaction.emoji.name) && user.id === author.id;
                 }
                 msg.awaitReactions(filter, { max: 1, time: 60 * 1000, errors: ['time'] }).then(async collected => {
                     const reaction = collected.first();
@@ -207,7 +204,7 @@ module.exports = {
                                 embed.setDescription('xp levels reset.')
                                 msg.edit(embed)
                                 //FOR MY GUILD ONLY
-                                if (message.guild.id === '778461267999588363') {
+                                if (guild.id === '778461267999588363') {
                                     regulars_role.members.forEach(member => member.roles.remove(regulars_role));
                                     active_role.members.forEach(member => member.roles.remove(regulars_role));
                                     super_active_role.members.forEach(member => member.roles.remove(regulars_role));
@@ -221,8 +218,8 @@ module.exports = {
 
                         const embed2 = new Discord.MessageEmbed()
                         .setColor('003C71')
-                        .setAuthor(`${message.author.tag} cleared leaderboard`, message.author.avatarURL({ dynamic: true }))
-                        .setDescription(`**Channel: **${message.channel}`)
+                        .setAuthor(`${author.tag} cleared leaderboard`, author.avatarURL({ dynamic: true }))
+                        .setDescription(`**Channel: **${channel}`)
                         .setTimestamp()
                         logs.send(embed2)
                     }                  
@@ -234,11 +231,11 @@ module.exports = {
             const embed = new Discord.MessageEmbed()
             .setColor('#003C71')
             .setTitle(`Are you sure? This will reset ${target.user.tag}'s xp.`)
-            message.channel.send(embed).then(msg => {
+            channel.send(embed).then(msg => {
                 msg.react(yesEmoji);
                 msg.react(noEmoji);
                 const filter = (reaction, user) => {
-                    return [yesEmoji, noEmoji].includes(reaction.emoji.name) && user.id === message.author.id;
+                    return [yesEmoji, noEmoji].includes(reaction.emoji.name) && user.id === author.id;
                 }
                 msg.awaitReactions(filter, { max: 1, time: 60 * 1000, errors: ['time'] }).then(async collected => {
                     const reaction = collected.first();
@@ -269,8 +266,8 @@ module.exports = {
                         })
                         const embed2 = new Discord.MessageEmbed()
                         .setColor('003C71')
-                        .setAuthor(`${message.author.tag} edited leaderboard`, message.author.avatarURL({ dynamic: true }))
-                        .setDescription(`**Channel: **${message.channel}\n**Target: **${member.user}\n**Action: ** clear user stats`)
+                        .setAuthor(`${author.tag} edited leaderboard`, author.avatarURL({ dynamic: true }))
+                        .setDescription(`**Channel: **${channel}\n**Target: **${member.user}\n**Action: ** clear user stats`)
                         .setTimestamp()
                         logs.send(embed2)
                     }
@@ -281,13 +278,13 @@ module.exports = {
         
         if (!args[0]) viewLeaderboard();
         else if (args[0] === 'clear') {
-            if (!member.hasPermission(this.perms)) return message.channel.send(`Missing perms: \`${this.perms}\``);
-            if (!guild.me.hasPermission(this.perms)) return message.channel.send(`I\`m missing perms: \`${this.perms}\``);
+            if (!member.hasPermission(this.perms)) return message.reply(`missing perms: \`${this.perms}\``);
+            if (!guild.me.hasPermission(this.perms)) return message.reply(`I\`m missing perms: \`${this.perms}\``);
             if (!target) clearLeaderboard();
             else clearUser()
         } else if (args[0] === 'edit') {
-            if (!member.hasPermission(this.perms)) return message.channel.send(`Missing perms: \`${this.perms}\``);
-            if (!guild.me.hasPermission(this.perms)) return message.channel.send(`I\`m missing perms: \`${this.perms}\``);
+            if (!member.hasPermission(this.perms)) return message.reply(`missing perms: \`${this.perms}\``);
+            if (!guild.me.hasPermission(this.perms)) return message.reply(`I\`m missing perms: \`${this.perms}\``);
             updateLeaderboard();
         }
     }

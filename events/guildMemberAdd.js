@@ -1,15 +1,16 @@
 const { DiscordAPIError } = require('discord.js');
 const { textChannels } = require('../config.json');
-const message = require('./message');
+const mongoose = require('mongoose');
+const guildConfigSchema = require('../schemas/guild-config-schema');
 module.exports = (client, Discord, dayjs) => {
     client.on('guildMemberAdd', async member => {
 
         //assign variables
-        const today = dayjs()
+        const today = dayjs();
         const date_registered = dayjs(member.user.createdTimestamp).format("MMMM D, YYYY h:mm A");
         const days_since_reg = Math.floor(dayjs(today).diff(date_registered, 'days'));
         const hours_since_reg = dayjs(today).diff(date_registered, 'hours');
-        const hours = Math.floor(hours_since_reg - days_since_reg * 24) + 1
+        const hours = Math.floor(hours_since_reg - days_since_reg * 24) + 1;
 
         const color = ((days_since_reg >= 15 && days_since_reg <= 45)) ? "FFD700" : (days_since_reg < 15 || (!member.user.flags.toArray().includes('VERIFIED_BOT') && member.user.bot)) ? "FF0000" : "00FF00";
         const welcome_gif = [
@@ -29,8 +30,8 @@ module.exports = (client, Discord, dayjs) => {
             'https://usaupload.com/file/ASR/reject4.gif'
         ];
 
-        const logs = member.guild.channels.cache.find((c) => c.name.includes('timbot-logs') && c.type === 'text');
-        const general = member.guild.channels.cache.find((c) => c.name.includes('general') && c.type === 'text');
+        const logs = member.guild.channels.cache.find(c => c.name.includes('timbot-logs') && c.type === 'text');
+        const general = member.guild.channels.cache.find(c => c.name.includes('general') && c.type === 'text');
 
         //altinator 9999
         const embed1 = new Discord.MessageEmbed()
@@ -69,16 +70,44 @@ module.exports = (client, Discord, dayjs) => {
                     member.kick()
                         .catch(err => {
                             console.log(err)
-                            message.channel.send(`Something stopped working. Please use \`t.report\` to report this bug!\n` + "```\n" + err + "```\n")
+                            general.send(`Something stopped working. Please use \`t.report\` to report this bug!\n` + "```\n" + err + "```\n")
                         })
                 });
             }
 
         //MAIN FUNCTION
-        if (days_since_reg < 15 || (!member.user.flags.toArray().includes('VERIFIED_BOT') && member.user.bot)) {
-            kickMember().then(logs.send(embed2))
-        } else {
-            general.send(embed1).then(logs.send(embed2))
-        }
+        await mongoose.connect(process.env.MONGO_URI, {
+            useNewUrlParser: true,
+            useFindAndModify: false,
+            useUnifiedTopology: true
+        }).then(async () => {
+            try {
+                const altinator = await guildConfigSchema.findOne({ guildId: member.guild.id })
+                const { enableAltinator } = altinator;
+                if (enableAltinator) {
+                    if (days_since_reg < 15 || (!member.user.flags.toArray().includes('VERIFIED_BOT') && member.user.bot)) {
+                        kickMember().then(() => {
+                            logs.send(embed2)
+                        }, err => {
+                            console.log(err)
+                        });
+                    } else {
+                        general.send(embed1).then(() => {
+                            logs.send(embed2)
+                        }, err => {
+                            console.log(err)
+                        })
+                    }
+                } else {
+                    general.send(embed1).then(() => {
+                        logs.send(embed2)
+                    }, err => {
+                        console.log(err)
+                    })
+                }
+            } catch (err) {
+                console.log(err)
+            }
+        })
     })
 }

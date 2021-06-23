@@ -25,6 +25,10 @@ const guildConfigSchema = mongoose.Schema({
     enableAntiAd: {
         type: Boolean,
         default: true
+    },
+    enableAltinator: {
+        type: Boolean,
+        default: true
     }
 })
 

@@ -6,76 +6,127 @@ module.exports = {
     desc: 'Mutes a user',
     aliases: ['mute'],
     usage: [
-        `${process.env.PREFIX}mute <@user> [time] [reason]`
+        `${process.env.PREFIX}mute <@user> <time> [reason]`,
     ],
     example: [
-        `${process.env.PREFIX}mute <@738918188376391712>`,
+        `${process.env.PREFIX}mute <@738918188376391712> 30m`,
         `${process.env.PREFIX}mute <@738918188376391712> 30m spamming`
     ],
     perms: ["MUTE_MEMBERS"],
     async execute(client, message, args, Discord) { 
 
-        let reason;
-        let time;
-        const mutedRole = message.guild.roles.cache.find(r => r.name.toLowerCase().includes('muted'))
-        const logs = message.guild.channels.cache.find(c => c.name.includes('timbot-logs'));
-        const member = message.mentions.members.first()
-
-        
         if (!args[0]) return client.commands.get('help').execute(client, message, args, Discord)
-        if (!message.member.hasPermission(this.perms)) return message.reply(`missing perms: \`${this.perms}\``)
-        if (!message.guild.me.hasPermission(this.perms)) return message.reply(`I'm missing perms: \`${this.perms}\``)
-        if (message.guild.me.roles.highest.comparePositionTo(mutedRole) < 0) return message.reply("My role needs to be higher than the muted role. Make sure you fix that!")
-        if (member.roles.cache.some(r => r.name === "Muted")) return message.reply(`**${member.user.tag}** has already been muted.`)
 
-        for (const perm of adminPerms) {
-            if (member.hasPermission(perm)) return message.reply(`**${member.user.tag}** cannot be muted.`)
+        let { guild, channel, member, mentions, author } = message;
+        const mutedRole = guild.roles.cache.find(role => role.name.toLowerCase().includes('muted'));
+        const logs = guild.channels.cache.find(channel => channel.name.includes('timbot-logs'));
+        //if (target.roles.cache.some(r => r.name === "Muted")) return message.reply(`**${target.user.tag}** has already been muted.`)
+        /**
+         * Mutes a member.
+         * @param {Snowflake} target 
+         * @param {String} time 
+         * @param {String} reason 
+         */
+        async function mute_member(target, time, reason) {
+            const err_embed = new Discord.MessageEmbed().setColor('861F41');
+            try {
+                target = mentions.members.first() || await guild.members.fetch(target);
+            } catch (err) {
+                console.log(err)
+                if (err instanceof DiscordAPIError) {
+                    err_embed.setTitle(`I couldn't find that user.`);
+                    if (err.code === 50035 || err.code === 10013 || err.code === 0) { //invalid form body || unknown user || 404 not found
+                        err_embed.setDescription(`Make sure you mention the user or provide their user ID (if they're in the server).`);
+                    } else {
+                        err_embed.setDescription(`\`\`\`js\n${err}\n\`\`\``);
+                    }
+                } else {
+                    err_embed.setTitle(`I coudln't execute that statement.`);
+                    err_embed.setDescription(`\`\`\`js\n${err}\n\`\`\``);
+                }
+                return channel.send(err_embed);
+            }
+
+            try {
+                time = ms(ms(time), { long: true });
+            } catch (err) {
+                err_embed.setTitle(`Invalid time`);
+                if (err.message === 'val is not a non-empty string or a valid number. val=undefined') {
+                    err_embed.setDescription(`Please enter a numerical value, such as \`3h\` or \`20m\` or \`2d\``);
+                } else {
+                    err_embed.setDescription(`\`\`\`js\n${err}\n\`\`\``);
+                }
+                return channel.send(err_embed);
+            }
+
+            for (const perm of adminPerms) {
+                if (target.hasPermission(perm)) {
+                    err_embed.setTitle(`I couldn't kick that user.`)
+                    err_embed.setDescription(`**${target.user.tag}** is immune to kicks.`)
+                    return channel.send(err_embed)
+                }
+            }
+
+            const mute_embed = new Discord.MessageEmbed()
+            .setColor('861F41')
+            .setTitle(`Muted ${target.user.tag}`);
+
+            const logs_embed = new Discord.MessageEmbed()
+            .setColor('861F41')
+            .setAuthor(`${author.tag} muted member`, author.avatarURL({ dynamic: true }))
+            .setDescription(`**Channel: **${channel}\n**Member: **${target.user}\n**Time: **${time}\n**Reason: **${reason}`)
+            .setTimestamp();
+
+            try {
+                if (target.roles.cache.some(role => role.equals(mutedRole))) {
+                    mute_embed.setTitle(`I couldn't mute that user.`);
+                    mute_embed.setDescription(`**${target.user.tag}** is already muted.`);
+                    return channel.send(mute_embed);
+                } else {
+                    await target.roles.add(mutedRole).then(setTimeout(() => { target.roles.remove(mutedRole) }, ms(time)));
+                }
+            } catch (err) {
+                console.log(err)
+                if (err instanceof DiscordAPIError) {
+                    mute_embed.setTitle(`I couldn't mute that user.`);
+                    if (err.code === 50013) { //missing perms
+                        mute_embed.setDescription(`Please make sure that the role \`${mutedRole.name}\` is lower than my role.`);
+                    } else {
+                        mute_embed.setDescription(`\`\`\`js\n${err}\n\`\`\``);
+                    }
+                }
+                return channel.send(mute_embed);
+            }
+
+            try {
+                await target.send(`You've been muted in **${guild.name}** for **${time}** because of **${reason}**`);
+            } catch (err) {
+                console.log(err);
+                if (err instanceof DiscordAPIError) {
+                    if (err.code === 50007) { //cannot dm user
+                        mute_embed.setFooter(`Couldn't DM user, mute logged.`);
+                    } else {
+                        mute_embed.setDescription(`\`\`\`js\n${err}\nPlease report this using the reportbug command.\n\`\`\``);
+                    }
+                } else {
+                    mute_embed.setDescription(`\`\`\`js\n${err}\nPlease report this using the reportbug command.\n\`\`\``);
+                }
+            } finally {
+                channel.send(mute_embed);
+                logs.send(logs_embed).catch(err => console.log(err));
+            }
         }
 
-        if (args[1]) {
-            if (args[1].match(/^\d/)) {
-                if (args[2]) reason = args.slice(2).join(' ')
-                time = ms(ms(args[1]), { long: true }) 
-            } else {
-                reason = args.slice(1).join(' ')  
-                time = "Indefinite"
-            }                                                    
-            
-            setTimeout(() => {
-                member.roles.remove(mutedRole.id);
-            }, (args[1].match(/^\d/) ? ms(args[1]) : 2147483647));
-        } else if (!args[1]) {
-            time = "Indefinite"
-            reason = "No reason given"
+        const perm_embed = new Discord.MessageEmbed()
+        .setColor('861F41')
+        .setTitle('Missing permisssions');
+        if (!member.hasPermission(this.perms)) {
+            perm_embed.setDescription(`You lack the permissions to use this command.`);
+            return channel.send(perm_embed);
+        } else if (!guild.me.hasPermission(this.perms)) {
+            perm_embed.setDescription(`I lack the permissions to use this command. Please make sure I have permission \`${this.perms}\``);
+            return channel.send(perm_embed);
         }
-
-        //muted embed
-        const embed1 = new Discord.MessageEmbed()
-        .setColor("#861F41")
-        .setTitle(`Muted ${member.user.tag} ${(time !== 'Indefinite' || undefined) ? `for ${time}` : 'indefinitely'}`)
-        .setTimestamp()
-
-        //send to logs
-        const embed2 = new Discord.MessageEmbed()
-        .setAuthor(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
-        .setColor("#861F41")
-        .setTitle("Member muted")
-        .setDescription(`**Member: ** ${member.user}\n**Duration: ** ${time}\n**Reason: ** ${reason}`)
-        .setTimestamp()
-
-
-        member.roles.add(mutedRole.id)
-            .then(() => {
-                member.send(`You've been muted in **${message.guild.name}** for: **${reason}**`)
-                    .then(() => {
-                        message.channel.send(embed1)
-                    }, err => {
-                        console.log(err)
-                        if (err instanceof DiscordAPIError) embed1.setFooter("Couldn't DM user, mute logged.")
-                        message.channel.send(embed1)
-                    })
-            }, err => {
-                console.log(err.stack)
-            }).then(logs.send(embed2));
+        mute_member(args[0], args[1], args.slice(2).join(' ') || "No reason given");
     }
 }
