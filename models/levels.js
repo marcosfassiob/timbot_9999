@@ -72,7 +72,7 @@ module.exports = (client, Discord) => {
 
                 if (!onCooldownVoice.has(message.author.id)) {
                     if (member.voice.channel) {
-                        if (member.voice.channel.id !== '853099601669914624') {
+                        if (member.voice.channel.id !== '853099601669914624') { //my guild's afk channel
                             addXP(guild.id, member.id, 5, message);
                         }
                         onCooldownVoice.add(message.author.id);
@@ -98,7 +98,7 @@ module.exports = (client, Discord) => {
                         guild.members.fetch(member.id).then(member => {
                             member.roles.add('853840453748654121');
                         })
-                    } else if (level <= 30) {
+                    } else if (level < 30) {
                         guild.members.fetch(member.id).then(member => {
                             member.roles.remove('853840453748654121');
                         })
@@ -108,7 +108,7 @@ module.exports = (client, Discord) => {
                         guild.members.fetch(member.id).then(member => {
                             member.roles.add('853840133899026432');
                         })
-                    } else if (level <= 25) {
+                    } else if (level < 25) {
                         guild.members.fetch(member.id).then(member => {
                             member.roles.remove('853840133899026432');
                         })
@@ -118,7 +118,7 @@ module.exports = (client, Discord) => {
                         guild.members.fetch(member.id).then(member => {
                             member.roles.add('847730964619591701');
                         })
-                    } else if (level <= 15) {
+                    } else if (level < 15) {
                         guild.members.fetch(member.id).then(member => {
                             member.roles.remove('847730964619591701');
                         })
@@ -128,7 +128,7 @@ module.exports = (client, Discord) => {
                         guild.members.fetch(member.id).then(member => {
                             member.roles.add('847730653466460160');
                         })
-                    } else if (level <= 10) {
+                    } else if (level < 10) {
                         guild.members.fetch(member.id).then(member => {
                             member.roles.remove('847730653466460160');
                         })
