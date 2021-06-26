@@ -94,6 +94,9 @@ module.exports = {
                     } else {
                         mute_embed.setDescription(`\`\`\`js\n${err}\n\`\`\``);
                     }
+                } else {
+                    mute_embed.setTitle(`I couldn't execute that statement.`);
+                    mute_embed.setDescription(`\`\`\`js\n${err}\n\`\`\``);
                 }
                 return channel.send(mute_embed);
             }
@@ -112,8 +115,12 @@ module.exports = {
                     mute_embed.setDescription(`\`\`\`js\n${err}\nPlease report this using the reportbug command.\n\`\`\``);
                 }
             } finally {
-                channel.send(mute_embed);
-                logs.send(logs_embed).catch(err => console.log(err));
+                try {
+                    channel.send(mute_embed);
+                    logs.send(logs_embed);
+                } catch (err) {
+                    console.log(err);
+                }
             }
         }
 
