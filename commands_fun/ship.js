@@ -208,7 +208,7 @@ module.exports = {
 
             //ship bar magic fuck yeah
             let progressBar = [red_semileft];
-            for (let i = 0; i < 10; i++) {
+            for (let i = 1; i < 11; i++) {
                 switch (true) {
                     case (i * 10 < shipRate):
                         progressBar.push(red_bar)
