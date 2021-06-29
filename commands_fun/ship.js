@@ -5,6 +5,7 @@ module.exports = {
     aliases: ['ship'],
     usage: [
         `${process.env.PREFIX}ship`,
+        `${process.env.PREFIX}ship [anything]`,
         `${process.env.PREFIX}ship [anything] [anything]`,
     ],
     example: [
@@ -66,7 +67,9 @@ module.exports = {
                 rate: paramTwo.user.id,
                 name: paramTwo.user.tag
             }
-            const shipRate = parseInt((parseInt(paramOne.rate) * parseInt(paramTwo.rate)).toString().substring(2, 4))
+            let shipRate = (parseInt(paramOne.rate) * parseInt(paramTwo.rate)).toString();
+            shipRate = parseInt(shipRate.substring(shipRate.length - 2, shipRate.length))
+            console.log(shipRate)
             return [shipRate, paramOne, paramTwo];
         }
 
@@ -101,7 +104,8 @@ module.exports = {
                     console.log(err);
                 }
             } finally {
-                const shipRate = parseInt((parseInt(paramOne.rate) * parseInt(paramTwo.rate)).toString().substring(2, 4))
+                let shipRate = (parseInt(paramOne.rate) * parseInt(paramTwo.rate)).toString().replace(/0{3,}/g, "");
+                shipRate = parseInt(shipRate.substring(shipRate.length - 2, shipRate.length))
                 return [shipRate, paramOne, paramTwo];
             }           
         }
@@ -148,7 +152,8 @@ module.exports = {
                     console.log(err);
                 }
             }            
-            const shipRate = parseInt((parseInt(paramOne.rate) * parseInt(paramTwo.rate)).toString().substring(2, 4))
+            let shipRate = (parseInt(paramOne.rate) * parseInt(paramTwo.rate)).toString().replace(/0{3,}/g, "");
+            shipRate = parseInt(shipRate.substring(shipRate.length - 2, shipRate.length))
             return [shipRate, paramOne, paramTwo];
         }
 
