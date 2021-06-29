@@ -43,7 +43,7 @@ module.exports = (client, Discord, dayjs) => {
             {name: "Account age:", value: `${Math.floor(days_since_reg)} ${(days_since_reg === 1) ? 'day' : 'days'}, ${hours} ${(hours === 1) ? 'hour' : 'hours'}`}
         )
         .setImage(welcome_gif[Math.floor(Math.random() * welcome_gif.length)])
-        .setFooter("Provided by TimBot Altinator 9999");
+        .setFooter("Want to disable this feature? Type \"t.altinator disable\"");
 
         //send to logs
         const embed2 = new Discord.MessageEmbed()
