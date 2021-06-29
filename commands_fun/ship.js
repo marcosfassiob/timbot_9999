@@ -67,8 +67,8 @@ module.exports = {
                 rate: paramTwo.user.id,
                 name: paramTwo.user.tag
             }
-            let shipRate = (parseInt(paramOne.rate) * parseInt(paramTwo.rate)).toString();
-            shipRate = parseInt(shipRate.substring(shipRate.length - 4, shipRate.length - 2))
+            let shipRate = (parseInt(paramOne.rate) * parseInt(paramTwo.rate)).toString()
+            shipRate = parseInt(shipRate.substring(8, 10))
             console.log(shipRate)
             return [shipRate, paramOne, paramTwo];
         }
@@ -105,7 +105,8 @@ module.exports = {
                 }
             } finally {
                 let shipRate = (parseInt(paramOne.rate) * parseInt(paramTwo.rate)).toString().replace(/0{3,}/g, "");
-                shipRate = parseInt(shipRate.substring(shipRate.length - 4, shipRate.length - 2))
+                console.log(shipRate);
+                shipRate = parseInt(shipRate.substring(10, 12))
                 return [shipRate, paramOne, paramTwo];
             }           
         }
@@ -153,7 +154,7 @@ module.exports = {
                 }
             }            
             let shipRate = (parseInt(paramOne.rate) * parseInt(paramTwo.rate)).toString().replace(/0{3,}/g, "");
-            shipRate = parseInt(shipRate.substring(shipRate.length - 4, shipRate.length - 2))
+            shipRate = parseInt(shipRate.substring(2, 4))
             return [shipRate, paramOne, paramTwo];
         }
 
