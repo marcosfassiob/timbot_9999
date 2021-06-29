@@ -66,8 +66,7 @@ module.exports = {
                 rate: paramTwo.user.id,
                 name: paramTwo.user.tag
             }
-            const shipRate = (parseInt(paramOne.rate) * parseInt(paramTwo.rate)).toString();
-            shipRate = parseInt(shipRate.substring(shipRate.length - 1, shipRate.length));
+            const shipRate = parseInt((parseInt(paramOne.rate) * parseInt(paramTwo.rate)).toString().substring(2, 4))
             return [shipRate, paramOne, paramTwo];
         }
 
@@ -102,8 +101,7 @@ module.exports = {
                     console.log(err);
                 }
             } finally {
-                const shipRate = (parseInt(paramOne.rate) * parseInt(paramTwo.rate)).toString();
-                shipRate = parseInt(shipRate.substring(shipRate.length - 1, shipRate.length));
+                const shipRate = parseInt((parseInt(paramOne.rate) * parseInt(paramTwo.rate)).toString().substring(2, 4))
                 return [shipRate, paramOne, paramTwo];
             }           
         }
@@ -150,8 +148,7 @@ module.exports = {
                     console.log(err);
                 }
             }            
-            const shipRate = (parseInt(paramOne.rate) * parseInt(paramTwo.rate)).toString();
-            shipRate = parseInt(shipRate.substring(shipRate.length - 1, shipRate.length));
+            const shipRate = parseInt((parseInt(paramOne.rate) * parseInt(paramTwo.rate)).toString().substring(2, 4))
             return [shipRate, paramOne, paramTwo];
         }
 
@@ -213,13 +210,13 @@ module.exports = {
             let progressBar = [red_semileft];
             for (let i = 1; i < 11; i++) {
                 switch (true) {
-                    case (i * 10 <= shipRate):
+                    case (i * 10 < shipRate):
                         progressBar.push(red_bar)
                         break;
-                    case (i * 10 > shipRate && i * 10 <= shipRate + 10):
+                    case (i * 10 >= shipRate && i * 10 < shipRate + 10):
                         progressBar.push(mix_bar)
                         break;
-                    case (i * 10 > shipRate + 10):
+                    case (i * 10 >= shipRate + 10):
                         progressBar.push(black_bar)
                         break;
                 }
