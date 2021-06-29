@@ -8,7 +8,7 @@ module.exports = {
         'boot'
     ],
     subcommands: [
-        '**kick ghost** - kicks a member *without* DMing them'
+        'kick ghost - kicks a member *without* DMing them'
     ],
     usage: [
         `${process.env.PREFIX}kick <@user> [reason]`,

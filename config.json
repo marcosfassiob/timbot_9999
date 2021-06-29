@@ -1,6 +1,7 @@
 {
-    "invite_link": "https://discord.com/oauth2/authorize?client_id=807464203358830605&scope=bot&permissions=499461375",
+    "invite_link": "https://discord.com/oauth2/authorize?client_id=807464203358830605&scope=bot&permissions=1556475135",
     "testbot_invite_link": "",
+    "discord_invite_link": "https://discord.gg/q439qazkT5",
 
     "textChannels":
     [

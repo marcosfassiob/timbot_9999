@@ -2,7 +2,7 @@ module.exports = {
     name: 'poll',
     desc: 'Creates a poll.',
     usage: `${process.env.PREFIX}poll <"question"> <"option1"> <"option2"> ["option3"] ... ["option10"]`,
-    //example: `${process.env.PREFIX}poll "pineapple on pizza?" "yes" "no"`,
+    example: `${process.env.PREFIX}poll "pineapple on pizza?" "yes" "no"`,
     aliases: ['poll'],
     perms: ['MANAGE_MESSAGES'],
     execute(client, message, args, Discord) {

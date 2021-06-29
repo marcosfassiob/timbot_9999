@@ -4,7 +4,7 @@ module.exports = {
     name: 'lock',
     desc: 'Locks the channel the message is sent in',
     aliases: ['lock'],
-    subcommands: ['**lock all** - locks *all* channels'],
+    subcommands: ['lock all - locks *all* channels'],
     usage: [
         `${process.env.PREFIX}lock <time> [reason]`,
         `${process.env.PREFIX}lock all <time> [reason]`

@@ -4,18 +4,18 @@ const { swearWords } = require('../words.json')
 const { DiscordAPIError } = require('discord.js');
 module.exports = {
     name: 'chatfilter',
-    desc: 'Configures chat filter settings\n**WARNING:** `filter disable, enable` STILL A WORK IN PROGRESS.',
+    desc: 'Configures chat filter settings',
     aliases: [
         'chatfilter',
         'filter'
     ],
     subcommands: [
-        '**chatfilter add** - adds a word to the bot\'s chat filter',
-        '**chatfilter remove** - removes a word from the bot\'s chat filter',
-        '**chatfilter disable** - disables the bot\'s chat filter',
-        '**chatfilter enable** - enables the bot\'s chat filter',
-        '**chatfilter list** - shows all censored words in filter',
-        '**chatfilter default** - resets chat filter to default settings'
+        'chatfilter add - adds a word to the bot\'s chat filter',
+        'chatfilter remove - removes a word from the bot\'s chat filter',
+        'chatfilter disable - disables the bot\'s chat filter',
+        'chatfilter enable - enables the bot\'s chat filter',
+        'chatfilter list - shows all censored words in filter',
+        'chatfilter default - resets chat filter to default settings'
     ],
     usage: [
         `${process.env.PREFIX}filter add <word>`,

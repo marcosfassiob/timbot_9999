@@ -5,7 +5,7 @@ module.exports = {
     desc: 'bans a user',
     aliases: 'ban',
     subcommands: [
-        '**ban ghost** - bans a user *without* DMing them'
+        'ban ghost - bans a user *without* DMing them'
     ],
     usage: [
         `${process.env.PREFIX}ban <@user> [reason]`, 

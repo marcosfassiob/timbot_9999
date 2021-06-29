@@ -5,7 +5,7 @@ module.exports = {
         'slowmode', 
         'slow'
     ],
-    subcommands: ['**slowmode all** - enables slowmode on *all* channels'],
+    subcommands: ['slowmode all - enables slowmode on *all* channels'],
     usage: [ 
         `${process.env.PREFIX}slowmode <time> [reason]`, 
         `${process.env.PREFIX}slowmode all <time> [reason]`,

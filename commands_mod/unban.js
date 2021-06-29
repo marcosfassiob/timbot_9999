@@ -9,12 +9,9 @@ module.exports = {
     perms: ["BAN_MEMBERS"],
     async execute(client, message, args, Discord) {
 
+        if (!args[0]) return client.commands.get('help').execute(client, message, args, Discord)
         const { member, guild, channel, author } = message;
         const logs = guild.channels.cache.find(channel => channel.name.includes('timbot-logs'));
-
-        if (!args[0]) return client.commands.get('help').execute(client, message, args, Discord)
-        if (!member.hasPermission(this.perms)) return message.reply(`missing perms: \`${this.perms}\``)
-        if (!guild.me.hasPermission(this.perms)) return message.reply(`I'm missing perms: \`${this.perms}\``)
 
         /**
          * Unbans a member
@@ -56,7 +53,12 @@ module.exports = {
             .setTimestamp()
 
             guild.members.unban(target, reason).then(() => {
-                channel.send(embed1);
+                try {
+                    channel.send(embed1);
+                    logs.send(embed2);
+                } catch (err) {
+                    console.log(err);
+                }
             }, err => {
                 console.log(err);
                 embed1.setTitle(`I couldn't unban that user.`);
@@ -73,13 +75,19 @@ module.exports = {
                 }
                 channel.send(embed1);
             })
-
-            try {
-                logs.send(embed2);
-            } catch (err) {
-                console.log(err);
-            }
         }
+
+        const perms_embed = new Discord.MessageEmbed()
+        .setColor('861F41')
+        .setTitle(`Missing permissions`);
+        if (!member.hasPermission(this.perms)) {
+            perms_embed.setDescription(`You lack the permissions to use this command.`)
+            return channel.send(perms_embed)
+        } else if (!guild.me.hasPermission(this.perms)) {
+            perms_embed.setDescription(`I don't have the permission \`${this.perms}\` to execute this command.`)
+            return channel.send(perms_embed)
+        }
+
         unban_member(args[0], args.slice(1).join(' ') || "No reason given");
     }
 }

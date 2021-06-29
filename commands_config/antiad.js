@@ -8,8 +8,8 @@ module.exports = {
         'antiad',
     ],
     subcommands: [
-        '**antiad enable** - enables antiad feature',
-        '**antiad disable** - disables antiad feature',
+        'antiad enable - enables antiad feature',
+        'antiad disable - disables antiad feature',
     ],
     usage: [
         `${process.env.PREFIX}antiad enable`,

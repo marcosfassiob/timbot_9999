@@ -14,7 +14,7 @@ module.exports = {
     example: [
         `${process.env.PREFIX}prefix %`,
     ],
-    perms: ["ADMINISTRATOR"],
+    perms: ["MANAGE_GUILD"],
     async execute(client, message, args, Discord) {
         if (!args[0]) return client.commands.get('help').execute(client, message, args, Discord);
         if (!message.member.hasPermission(this.perms)) return message.reply(`missing perms: \`${this.perms}\``);

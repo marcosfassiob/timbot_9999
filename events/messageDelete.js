@@ -2,42 +2,59 @@ const { swearWords } = require('../words.json')
 module.exports = (client, Discord) => {
     client.on('messageDelete', async message => {
 
-        if (message.author.bot) return;
-        if (message.channel.type === "dm") return;
-        await Discord.Util.delayFor(250)
+        const { 
+            author,
+            attachments, 
+            channel, 
+            content, 
+            guild, 
+        } = message;
+
+        if (author.bot) return;
+        if (channel.type === "dm") return;
+        await Discord.Util.delayFor(1000)
 
         //edit if necessary
-        if (message.content.length > 1000) message.content = message.content.substring(0, 1000) + "..."
+        if (content.length > 1000) content = content.substring(0, 1000) + "...";
         
         //set up snipes
-        client.snipes.set(message.channel.id, {
-            content: message.content,
-            author: message.member,
-            image: message.attachments.first() ? message.attachments.first().proxyURL : null
+        client.snipes.set(channel.id, {
+            content: content,
+            author: author,
+            image: attachments.first() ? attachments.first().proxyURL : null
         })
 
         //send embed
-        const logs = message.guild.channels.cache.find((c) => c.name.includes('timbot-logs'));
-        const entry = await message.guild.fetchAuditLogs({ type: 'MESSAGE_DELETE' }).then(audit => audit.entries.first())
         const embed = new Discord.MessageEmbed()
-        .setAuthor(`${message.author.tag} message deleted`, message.author.displayAvatarURL({ dynamic: true }))
+        .setAuthor(`${author.tag} message deleted`, author.avatarURL({ dynamic: true }))
         .setColor("#E87722")
-        .setDescription(`**Channel: ** ${message.channel}`)
+        .setDescription(`**Channel: ** ${channel}`)
         .addFields(
-            { name: "Message content:", value: message.content || message.attachments.first().proxyURL || "nothing to see here lol" }, //bandaid fix
+            { name: "Message content:", value: content || attachments.first().proxyURL || "nothing to see here" }, //bandaid fix
         )
         .setTimestamp()
 
+        try {
+            const entry = await guild.fetchAuditLogs({ 
+                type: 'MESSAGE_DELETE',
+            }).then(audit => audit.entries.first())
 
-        //send to logs
-        if (entry.extra.channel.id === message.channel.id &&
-            entry.target.id === message.author.id &&
-            entry.createdTimestamp > (Date.now() - 20000) &&
-            entry.extra.count >= 1) {
-                embed.setDescription(`**Channel: ** ${message.channel}\n**Deleted by: **${entry.executor}`)
-                logs.send(embed)
-        } else {
-            logs.send(embed)
+            //send to logs
+            if (entry.extra.channel.id === channel.id 
+            && entry.target.id === author.id 
+            && entry.createdTimestamp > (Date.now() - 20000) 
+            && entry.extra.count >= 1) {
+                embed.setDescription(`**Channel: ** ${channel}\n**Deleted by: **${entry.executor}`);
+            }
+        } catch (err) {
+            console.log(err);
+        } finally {
+            try {
+                const logs = guild.channels.cache.find(channel => channel.name.includes('timbot-logs'));
+                logs.send(embed);
+            } catch (err) {
+                console.log(err);
+            }
         }
     })
 }

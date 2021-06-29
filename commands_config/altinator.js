@@ -8,8 +8,8 @@ module.exports = {
         'alt',
     ],
     subcommands: [
-        '**altinator enable** - enables altinator',
-        '**altinator disable** - disables altinator',
+        'altinator enable - enables altinator',
+        'altinator disable - disables altinator',
     ],
     usage: [
         `${process.env.PREFIX}antiad enable`,

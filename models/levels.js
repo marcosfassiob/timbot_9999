@@ -70,28 +70,6 @@ module.exports = (client, Discord) => {
                 if (result === null) return;
                 const { level } = result;
 
-                if (!onCooldownVoice.has(message.author.id)) {
-                    if (member.voice.channel) {
-                        if (member.voice.channel.id !== '853099601669914624') { //my guild's afk channel
-                            addXP(guild.id, member.id, 5, message);
-                        }
-                        onCooldownVoice.add(message.author.id);
-                        setTimeout(() => onCooldown.delete(message.author.id), 60 * 1000);
-                    }
-                }
-                
-                if (!onCooldown.has(message.author.id)) {
-                    //add xp
-                    const random = (min, max) => {
-                        min = Math.ceil(min);
-                        max = Math.floor(max);
-                        return Math.floor(Math.random() * (max - min) + min);
-                    }
-                    addXP(message.guild.id, message.member.id, random(10, 25), message)
-                    onCooldown.add(message.author.id)
-                    setTimeout(() => onCooldown.delete(message.author.id), 20 * 1000)
-                }
-
                 //FOR MY GUILD ONLY
                 if (message.guild.id === '778461267999588363') {
                     if (level >= 30) {
@@ -143,6 +121,28 @@ module.exports = (client, Discord) => {
                             member.roles.remove('778478893451182140');
                         })
                     }
+                }
+
+                if (!onCooldownVoice.has(message.author.id)) {
+                    if (member.voice.channel) {
+                        if (member.voice.channel.id !== '853099601669914624') { //my guild's afk channel
+                            addXP(guild.id, member.id, 5, message);
+                        }
+                        onCooldownVoice.add(message.author.id);
+                        setTimeout(() => onCooldown.delete(message.author.id), 60 * 1000);
+                    }
+                }
+                
+                if (!onCooldown.has(message.author.id)) {
+                    //add xp
+                    const random = (min, max) => {
+                        min = Math.ceil(min);
+                        max = Math.floor(max);
+                        return Math.floor(Math.random() * (max - min) + min);
+                    }
+                    addXP(message.guild.id, message.member.id, random(10, 25), message)
+                    onCooldown.add(message.author.id)
+                    setTimeout(() => onCooldown.delete(message.author.id), 20 * 1000)
                 }
             } catch (err) {
                 console.log(err)

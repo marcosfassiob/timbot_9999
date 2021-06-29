@@ -61,8 +61,8 @@ module.exports = (client, Discord) => {
 
         //edit a couple things cause if not bot goes byebye
         if (oldMessage.content === newMessage.content) return;
-        if (oldMessage.content.length > 1000) oldMessage.content = oldMessage.content.substring(0, 1000) + "..."
-        if (newMessage.content.length > 1000) newMessage.content = newMessage.content.substring(0, 1000) + "..."
+        if (oldMessage.content.length > 1000) oldMessage.content = oldMessage.content.substring(0, 1000) + "...";
+        if (newMessage.content.length > 1000) newMessage.content = newMessage.content.substring(0, 1000) + "...";
         if (!oldMessage.partial) {
             const embed = new Discord.MessageEmbed()
             .setColor("#E87722")
@@ -73,16 +73,18 @@ module.exports = (client, Discord) => {
                 { name: "Edited message:", value: newMessage.content || newMessage.attachments.first().proxyURL, inline: true },
             )
             .setTimestamp()
-            logs.send(embed)
+            try {
+                logs.send(embed);
+            } catch (err) {
+                console.log(err);
+            }
         }
         
         //snipes
         client.editsnipes.set(oldMessage.channel.id, {
             oldContent: oldMessage.content,
-            newContent: newMessage.content,
-            author: oldMessage.member,
             oldImage: oldMessage.attachments.first() ? oldMessage.attachments.first().proxyURL : null,
-            newImage: newMessage.attachments.first() ? newMessage.attachments.first().proxyURL : null
+            author: oldMessage.author,
         })
     })
 }

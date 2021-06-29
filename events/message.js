@@ -64,7 +64,7 @@ module.exports = (client, Discord) => {
         }
 
         //set up everything for commands
-        const prefix = guildPrefixes[message.guild.id] || process.env.PREFIX
+        const prefix = guildPrefixes[message.guild.id]
         if (!message.content.toLowerCase().startsWith(prefix)) return;
         
         const args = message.content.slice(prefix.length).trim().split(/ +/);

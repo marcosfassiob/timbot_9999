@@ -9,51 +9,36 @@ module.exports = {
     perms: ["None"],
     async execute(client, message, args, Discord) {
 
-        const logs = message.guild.channels.cache.find((c) => c.name.includes('timbot-logs'));
-        const msg = client.snipes.get(message.channel.id)
-
-        //no snipe?
+        const { channel, guild, author } = message;
+        const msg = client.snipes.get(channel.id)
         if (!msg) return message.reply("Nothing to snipe!")               
 
         //snipe itself
         const embed1 = new Discord.MessageEmbed()
         .setColor("#C64600")
-        .setAuthor(`Dear ${msg.author.user.username},`, msg.author.user.displayAvatarURL())
-        .setTitle("You really thought you could get away with that?")
-        .addField("Deleted message:", `${msg.content}` || msg.image)
-        .setFooter("get fucked lol")
-
-        //send to logs
-        const embed2 = new Discord.MessageEmbed()
-        .setAuthor(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
-        .setColor("#C64600")
-        .setTitle("Snipe command used")
-        .setDescription(`**Used on: ** ${msg.author}\n**Channel: ** ${message.channel}`)
-        .addFields(
-            {name: "Message content:", value: msg.content || msg.image }
-        )
-        .setTimestamp()
+        .setAuthor(`${msg.author.username} really thought they were slick lol`, msg.author.avatarURL({ dynamic: true }))
+        .setDescription(`**Deleted message:** ${msg.content || msg.image}`)
+        .setFooter(`yours truly, ${author.username}`)
 
         await mongoose.connect(process.env.MONGO_URI, {
             useNewUrlParser: true,
             useFindAndModify: false,
             useUnifiedTopology: true
         }).then(async () => {
-            const filter = await guildConfigSchema.findOne({ guildId: message.guild.id }, 'chatFilter');
-            const { chatFilter } = filter;
-            for (const word of chatFilter) {
-                if (msg.content.toLowerCase().includes(word)) {
-                    return message.channel.send("nice try lmao").then(m => {
-                        setTimeout(() => { m.delete() }, 5000)
-                    })
+            try {
+                const filter = await guildConfigSchema.findOne({ guildId: guild.id }, 'chatFilter');
+                const { chatFilter } = filter;
+                for (const word of chatFilter) {
+                    if (msg.content.toLowerCase().includes(word)) {
+                        return channel.send("nice try lmao").then(m => {
+                            setTimeout(() => { m.delete() }, 5000)
+                        })
+                    }
                 }
+                channel.send(embed1);
+            } catch (err) {
+                console.log(err);
             }
-
-            message.channel.send(embed1).then(() => {
-                logs.send(embed2)
-            }, err => {
-                console.log(err)
-            })
         })
     }
 }

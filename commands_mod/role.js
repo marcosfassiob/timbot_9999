@@ -4,10 +4,10 @@ module.exports = {
     desc: 'Adds or removes a role',
     aliases: 'role',
     subcommands: [
-        '**role add** - assigns a role to a member',
-        '**role remove** - removes a role from a memebr',
-        '**role create** - creates a role',
-        '**role delete** - deletes a role'
+        'role add - assigns a role to a member',
+        'role remove - removes a role from a memebr',
+        'role create - creates a role',
+        'role delete - deletes a role'
     ],
     usage: [
         `${process.env.PREFIX}role add <@user> <role>`, 

@@ -2,7 +2,7 @@ module.exports = {
     name: 'unlock',
     desc: 'Unlocks the channel the message is sent in',
     aliases: ['unlock'],
-    subcommands: ['**unlock all** - unlocks *all* channels'],
+    subcommands: ['unlock all - unlocks *all* channels'],
     usage: [`${process.env.PREFIX}unlock`],
     example: [
         `${process.env.PREFIX}unlock`,

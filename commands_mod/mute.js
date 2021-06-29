@@ -83,7 +83,25 @@ module.exports = {
                     mute_embed.setDescription(`**${target.user.tag}** is already muted.`);
                     return channel.send(mute_embed);
                 } else {
-                    await target.roles.add(mutedRole).then(setTimeout(() => { target.roles.remove(mutedRole) }, ms(time)));
+                    await target.roles.add(mutedRole).then(() => {
+                        setTimeout(() => { 
+                            target.roles.remove(mutedRole).catch(err => {
+                                console.log(err);
+                                err_embed.setTitle(`An error has occured while trying to unmute ${target.user.tag}.`);
+                                if (err instanceof DiscordAPIError) {
+                                    if (err.code === 50013) { //missing perms
+                                        err_embed.setDescription(`Make sure that the role \`${mutedRole.name}\` is lower than my role.`);
+                                    } else {
+                                        err_embed.setDescription(`\`\`\`js\n${err}\n\`\`\``);
+
+                                    }
+                                } else {
+                                    err_embed.setDescription(`\`\`\`js\n${err}\n\`\`\``);
+                                } 
+                                return channel.send(err_embed)
+                            })
+                        }, ms(time));
+                    });
                 }
             } catch (err) {
                 console.log(err)

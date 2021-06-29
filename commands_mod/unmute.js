@@ -1,4 +1,5 @@
 const { DiscordAPIError } = require("discord.js");
+const { adminPerms } = require('../config.json');
 
 module.exports = {
     name: 'unmute',
@@ -6,22 +7,91 @@ module.exports = {
     aliases: 'unmute',
     usage: [
         `${process.env.PREFIX}unmute <@user>`,
-        `${process.env.PREFIX}unmute <userid>`
     ],
     example: [
         `${process.env.PREFIX}unmute <@738918188376391712>`,
-        `${process.env.PREFIX}unmute 738918188376391712`
-
     ],
     perms: ["MUTE_MEMBERS"],
     execute(client, message, args, Discord) {
 
         if (!args[0]) return client.commands.get('help').execute(client, message, args, Discord);
         const { member, guild, mentions, author, channel } = message;
-        const target = mentions.members.first() || guild.members.cache.get(args[0]);
         const mutedRole = guild.roles.cache.find(role => role.name.toLowerCase().includes('muted'));
         const logs = guild.channels.cache.find(channel => channel.name.includes('timbot-logs'));
-        if (!target.roles.cache.some(role => role.name === "Muted")) return message.reply(`**${target.user.tag}** has not been muted.`);
+
+        /**
+         * Unmutes a member by removing the "Muted" role
+         * @param {Snowflake} target 
+         * @param {String} reason 
+         */
+        async function unmute_member(target, reason) {
+            const err_embed = new Discord.MessageEmbed().setColor('861F41');
+            try {
+                target = mentions.members.first() || await guild.members.fetch(target);
+            } catch (err) {
+                console.log(err)
+                if (err instanceof DiscordAPIError) {
+                    err_embed.setTitle(`I couldn't find that user.`);
+                    if (err.code === 50035 || err.code === 10013 || err.code === 0) { //invalid form body || unknown user || 404 not found
+                        err_embed.setDescription(`Make sure you mention the user or provide their user ID (if they're in the server).`);
+                    } else {
+                        err_embed.setDescription(`\`\`\`js\n${err}\n\`\`\``);
+                    }
+                } else {
+                    err_embed.setTitle(`I coudln't execute that statement.`);
+                    err_embed.setDescription(`\`\`\`js\n${err}\n\`\`\``);
+                }
+                return channel.send(err_embed);
+            }
+
+            for (const perm of adminPerms) {
+                if (target.hasPermission(perm)) {
+                    err_embed.setTitle(`I couldn't kick that user.`)
+                    err_embed.setDescription(`**${target.user.tag}** is immune to kicks.`)
+                    return channel.send(err_embed)
+                }
+            }
+
+            const unmute_embed = new Discord.MessageEmbed()
+            .setColor('861F41')
+            .setTitle(`Unmuted ${target.user.tag}`);
+
+            const logs_embed = new Discord.MessageEmbed()
+            .setColor('861F41')
+            .setAuthor(`${author.tag} unmuted member`, author.avatarURL({ dynamic: true }))
+            .setDescription(`**Channel: **${channel}\n**Member: **${target.user}\n**Reason: **${reason}`)
+            .setTimestamp();
+
+            try {
+                if (!target.roles.cache.some(role => role.equals(mutedRole))) {
+                    unmute_embed.setTitle(`I couldn't unmute that user.`);
+                    unmute_embed.setDescription(`**${target.user.tag}** is currently not muted.`);
+                    return channel.send(unmute_embed);
+                } else {
+                    await target.roles.remove(mutedRole);
+                    try {
+                        channel.send(unmute_embed);
+                        logs.send(logs_embed);
+                    } catch (err) {
+                        console.log(err);
+                    }
+                }
+            } catch (err) {
+                console.log(err)
+                if (err instanceof DiscordAPIError) {
+                    unmute_embed.setTitle(`I couldn't unmute that user.`);
+                    if (err.code === 50013) { //missing perms
+                        unmute_embed.setDescription(`Please make sure that the role \`${mutedRole.name}\` is lower than my role.`);
+                    } else {
+                        unmute_embed.setDescription(`\`\`\`js\n${err}\n\`\`\``);
+                    }
+                } else {
+                    unmute_embed.setTitle(`I couldn't execute that statement.`);
+                    unmute_embed.setDescription(`\`\`\`js\n${err}\n\`\`\``);
+                }
+                return channel.send(unmute_embed);
+            }
+        }
 
         const perms_embed = new Discord.MessageEmbed()
         .setColor('861F41')
@@ -34,30 +104,6 @@ module.exports = {
             return channel.send(perms_embed)
         }
 
-        const embed1 = new Discord.MessageEmbed()
-        .setColor("#861F41")
-        .setTitle(`Unmuted ${target.user.tag}`)
-        .setTimestamp()
-
-        //send to logs
-        const embed2 = new Discord.MessageEmbed()
-        .setAuthor(`${author.tag} unmuted member`, author.avatarURL({ dynamic: true }))
-        .setColor("#861F41")
-        .setDescription(`**Member: **${target.user.tag}\n**Channel: **${channel}`)
-        .setTimestamp();
-
-        target.roles.remove(mutedRole.id).then(() => {
-            channel.send(embed1);
-            logs.send(embed2).catch(err => console.log(err))
-        }, err => {
-            console.log(err);
-            if (err instanceof DiscordAPIError) {
-                if (err.code === 50013) {
-                    return message.reply(`I can't unmute that member. Make sure my roles/permissions are higher than theirs!`)
-                } else {
-                    return message.reply(`I couldn't mute that user.\n\`\`\`js\n${err}\n\`\`\``)
-                }
-            }
-        })
+        unmute_member(args[0], args.slice(1).join(' ') || "No reason given");
     }
 }

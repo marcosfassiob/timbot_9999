@@ -13,8 +13,8 @@ module.exports = {
         `${process.env.PREFIX}leaderboard edit <@user> <level> [xp]`,
     ],
     subcommands: [
-        '**lb clear [@user]** - clears the leaderboard [or a user\'s stats]',
-        '**lb edit <@user> <level> [xp]** - edit a user\'s stats'
+        'lb clear [@user] - clears the leaderboard [or a user\'s stats]',
+        'lb edit <@user> <level> [xp] - edit a user\'s stats'
     ],
     perms: "ADMINISTRATOR",
     async execute(client, message, args, Discord) {
@@ -72,7 +72,7 @@ module.exports = {
 
                     const embed = new Discord.MessageEmbed()
                     .setColor('#003C71')
-                    .setTitle(`Top 50 users in ${guild.name}:`)
+                    .setTitle(`Top ${results.length} users in ${guild.name}:`)
                     .setDescription(desc)
                     .setThumbnail(guild.iconURL({ dynamic: true })) 
                     .setFooter(`Page 1 of ${upper_limit}`)   

@@ -1,4 +1,4 @@
-const { invite_link } = require('../config.json')
+const { invite_link, discord_invite_link } = require('../config.json')
 const guildConfigSchema = require('../schemas/guild-config-schema')
 
 module.exports = {
@@ -31,7 +31,7 @@ module.exports = {
             .setDescription(
                 `Current prefix: \`${result.prefix}\`
                 [Invite me to your server!](${invite_link})
-                [Join our Discord server!](https://discord.gg/q439qazkT5)`
+                [Join our Discord server!](${discord_invite_link})`
             )
             .addFields(
                 { name: "Fun commands:", value: fun_commands, inline: true },
@@ -72,18 +72,24 @@ module.exports = {
                 return color;
             }
 
-            const embed5 = new Discord.MessageEmbed()
+            let { name, desc, perms, aliases, subcommands, usage, example } = command;
+            let embed5 = new Discord.MessageEmbed()
             .setColor(findColor())
-            .setTitle(`About ${command.name}`)
-            .setDescription(`**Description:** ${command.desc}\n**Usage:** Do not include any hooks like **<>** (required) or **[]** (optional) in your messages`)
+            .setTitle(`${name} - ${desc}`)
             .addFields(
-                { name: "Expected usage:", value: command.usage, inline: true },
-                { name: "Examples:", value: (command.example !== undefined) ? command.example : "pretty self-explanatory", inline: true },
-                { name: "Aliases:", value: command.aliases, inline: true },
-                { name: "Required permissions: ", value: command.perms },
-                { name: "Subcommands:", value: (command.subcommands === undefined) ? "None" : command.subcommands },  
+                { name: "Expected usage:", value: usage || "pretty self-explanatory lol" },
+                { name: "Examples:", value: example || "pretty self-explanatory lol" },
+                { name: "Subcommands:", value: subcommands || "None" }
             )
-            message.channel.send(embed5)
+
+            try {
+                aliases = aliases.join(', ');
+            } catch (err) {
+                console.log(err)
+            } finally {
+                embed5.setDescription(`**Required permissions: **\`${perms}\`\n**Aliases: **\`${aliases}\``);
+                message.channel.send(embed5)
+            }
         }
         
         if (!args[0] && message.content.startsWith(`${prefix}help`) || message.content === `${prefix}`) help()
