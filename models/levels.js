@@ -72,7 +72,7 @@ module.exports = (client) => {
                         setInterval(() => {
                             addXP(guild.id, member.id, 5, oldState);
                             onCooldownVoice.add(member.id);
-                            setTimeout(() => { onCooldownVoice.remove(member.id) }, 60 * 1000)
+                            setTimeout(() => { onCooldownVoice.delete(member.id) }, 60 * 1000)
                         }, 60 * 1000) //10 minutes
                     }
                 } catch (err) {
