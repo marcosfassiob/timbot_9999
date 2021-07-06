@@ -165,7 +165,7 @@ module.exports = {
                         }).then(async () => {
                             try {
                                 await levelSchema.findOneAndUpdate(
-                                    { guildId: guild.id, userId: member.id },
+                                    { guildId: guild.id, userId: target.id },
                                     { $set: { level: args[2], xp: args[3] || 0 }}
                                 )
                             } catch (err) {
