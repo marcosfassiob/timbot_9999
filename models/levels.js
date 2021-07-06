@@ -108,7 +108,7 @@ module.exports = (client) => {
                     }
                     addXP(guild.id, author.id, random(10, 25), message)
                     onCooldown.add(author.id)
-                    setTimeout(() => onCooldown.delete(author.id), 20 * 1000)
+                    setTimeout(() => onCooldown.delete(author.id), 60 * 1000)
                 }
                 const result = await levelSchema.findOne({ guildId: guild.id, userId: author.id });
                 if (result === null) return;
