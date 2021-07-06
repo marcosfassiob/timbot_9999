@@ -147,7 +147,7 @@ module.exports = {
 
             const embed = new Discord.MessageEmbed()
             .setColor('003C71')
-            .setTitle(`Are you sure you want to update ${member.user.tag}'s stats?`)
+            .setTitle(`Are you sure you want to update ${target.user.tag}'s stats?`)
             .setDescription(`**New level: **${args[2]}\n**New xp: **${args[3] || 0} xp`)
             channel.send(embed).then(msg => {
                 msg.react(noEmoji);
