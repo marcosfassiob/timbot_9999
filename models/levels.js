@@ -53,6 +53,7 @@ const addXP = async (guildId, userId, xpToAdd, messageOrVoiceState) => {
 }  
 
 const onCooldown = new Set();
+const onCooldownVoice = new Set();
 module.exports.addXP = addXP;
 
 module.exports = (client) => {
@@ -67,9 +68,13 @@ module.exports = (client) => {
                 useUnifiedTopology: true
             }).then(() => {
                 try {
-                    setInterval(() => {
-                        addXP(guild.id, member.id, 5, oldState);
-                    }, 60 * 1000)
+                    if (!onCooldownVoice.has(member.id)) {
+                        setInterval(() => {
+                            addXP(guild.id, member.id, 5, oldState);
+                            onCooldownVoice.add(member.id);
+                            setTimeout(() => { onCooldownVoice.remove(member.id) }, 60 * 1000)
+                        }, 10 * 60 * 1000) //10 minutes
+                    }
                 } catch (err) {
                     console.log(err)
                 }
