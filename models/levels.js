@@ -3,7 +3,7 @@ const levelSchema = require('../schemas/level-schema')
 
 //xp needed & add xp
 const getNeededXp = level => 4 * Math.pow(level, 2) + (45 * level) + 120 
-const addXP = async (guildId, userId, xpToAdd, messageOrVoiceState) => {
+const addXP = async (guildId, userId, xpToAdd, message) => {
     await mongoose.connect(process.env.MONGO_URI, {
         useNewUrlParser: true,
         useFindAndModify: false,
@@ -16,23 +16,22 @@ const addXP = async (guildId, userId, xpToAdd, messageOrVoiceState) => {
                 { upsert: true, new: true })
 
             let { xp, level } = result;
-            const { member, guild } = messageOrVoiceState;
+            const { member, guild } = message;
             const needed = getNeededXp(level);
             console.log(`guild: ${guild.name}, user: ${member.user.tag}, level: ${level}, xp: ${xp}`);
 
             if (xp >= needed) {
                 ++level
                 xp -= needed
-                messageOrVoiceState.member.send(`You have now leveled up!`, {
-                    embed: {
+                member.send({ embed: {
                         author: {
-                            name: `${member.user.tag}, congrats on ranking up!`,
+                            name: `You've ranked up in ${guild.name}!`,
                         },
                         title: `New level: ${level}`,
                         color: `#003C71`,
                         description: `XP needed: ${needed} xp`,
                         thumbnail: {
-                            url: member.user.avatarURL({ dynamic: true })
+                            url: guild.iconURL({ dynamic: true })
                         },
                         footer: {
                             text: `if you want to stop receiving these, block me.`
@@ -58,6 +57,7 @@ module.exports.addXP = addXP;
 
 module.exports = (client) => {
 
+    /* commenting this out for now cause this shits hard lol
     client.on('voiceStateUpdate', async (oldState, newState) => {
         const { guild, member } = oldState;
         if (member.user.bot) return;
@@ -81,6 +81,7 @@ module.exports = (client) => {
             })
         }
     })
+    */
 
     client.on('message', async message => {
         const { guild, member, author, channel } = message;
@@ -108,7 +109,7 @@ module.exports = (client) => {
                     }
                     addXP(guild.id, author.id, random(10, 25), message)
                     onCooldown.add(author.id)
-                    setTimeout(() => onCooldown.delete(author.id), 60 * 1000)
+                    setTimeout(() => onCooldown.delete(author.id), 20 * 1000)
                 }
                 const result = await levelSchema.findOne({ guildId: guild.id, userId: author.id });
                 if (result === null) return;
