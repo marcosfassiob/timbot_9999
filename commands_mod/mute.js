@@ -20,7 +20,7 @@ module.exports = {
         let { guild, channel, member, mentions, author } = message;
         const mutedRole = guild.roles.cache.find(role => role.name.toLowerCase().includes('muted'));
         const logs = guild.channels.cache.find(channel => channel.name.includes('timbot-logs'));
-        //if (target.roles.cache.some(r => r.name === "Muted")) return message.reply(`**${target.user.tag}** has already been muted.`)
+
         /**
          * Mutes a member.
          * @param {Snowflake} target 
@@ -61,8 +61,8 @@ module.exports = {
 
             for (const perm of adminPerms) {
                 if (target.hasPermission(perm)) {
-                    err_embed.setTitle(`I couldn't kick that user.`)
-                    err_embed.setDescription(`**${target.user.tag}** is immune to kicks.`)
+                    err_embed.setTitle(`I couldn't mute that user.`)
+                    err_embed.setDescription(`**${target.user.tag}** is immune to mutes.`)
                     return channel.send(err_embed)
                 }
             }
@@ -83,25 +83,47 @@ module.exports = {
                     mute_embed.setDescription(`**${target.user.tag}** is already muted.`);
                     return channel.send(mute_embed);
                 } else {
-                    await target.roles.add(mutedRole).then(() => {
-                        setTimeout(() => { 
-                            target.roles.remove(mutedRole).catch(err => {
-                                console.log(err);
-                                err_embed.setTitle(`An error has occured while trying to unmute ${target.user.tag}.`);
-                                if (err instanceof DiscordAPIError) {
-                                    if (err.code === 50013) { //missing perms
-                                        err_embed.setDescription(`Make sure that the role \`${mutedRole.name}\` is lower than my role.`);
+                    try {
+                        await target.send(`You've been muted in **${guild.name}**\nTime: **${time}**\nReason: **${reason}**`);
+                    } catch (err) {
+                        console.log(err);
+                        if (err instanceof DiscordAPIError) {
+                            if (err.code === 50007) { //cannot dm user
+                                mute_embed.setFooter(`Couldn't DM user, mute logged.`);
+                            } else {
+                                mute_embed.setDescription(`\`\`\`js\n${err}\nPlease report this using the reportbug command.\n\`\`\``);
+                            }
+                        } else {
+                            mute_embed.setDescription(`\`\`\`js\n${err}\nPlease report this using the reportbug command.\n\`\`\``);
+                        }
+                    } finally {
+                        await target.roles.add(mutedRole).then(() => {
+                            setTimeout(() => { 
+                                target.roles.remove(mutedRole).catch(err => {
+                                    console.log(err);
+                                    err_embed.setTitle(`An error has occured while trying to unmute ${target.user.tag}.`);
+                                    if (err instanceof DiscordAPIError) {
+                                        if (err.code === 50013) { //missing perms
+                                            err_embed.setDescription(`Make sure that the role \`${mutedRole.name}\` is lower than my role.`);
+                                        } else {
+                                            err_embed.setDescription(`\`\`\`js\n${err}\n\`\`\``);
+    
+                                        }
                                     } else {
                                         err_embed.setDescription(`\`\`\`js\n${err}\n\`\`\``);
+                                    } 
+                                    return channel.send(err_embed)
+                                })
+                            }, ms(time));
+                        });
 
-                                    }
-                                } else {
-                                    err_embed.setDescription(`\`\`\`js\n${err}\n\`\`\``);
-                                } 
-                                return channel.send(err_embed)
-                            })
-                        }, ms(time));
-                    });
+                        try {
+                            channel.send(mute_embed);
+                            logs.send(logs_embed);
+                        } catch (err) {
+                            console.log(err);
+                        }
+                    }
                 }
             } catch (err) {
                 console.log(err)
@@ -119,27 +141,7 @@ module.exports = {
                 return channel.send(mute_embed);
             }
 
-            try {
-                await target.send(`You've been muted in **${guild.name}** for **${time}** because of **${reason}**`);
-            } catch (err) {
-                console.log(err);
-                if (err instanceof DiscordAPIError) {
-                    if (err.code === 50007) { //cannot dm user
-                        mute_embed.setFooter(`Couldn't DM user, mute logged.`);
-                    } else {
-                        mute_embed.setDescription(`\`\`\`js\n${err}\nPlease report this using the reportbug command.\n\`\`\``);
-                    }
-                } else {
-                    mute_embed.setDescription(`\`\`\`js\n${err}\nPlease report this using the reportbug command.\n\`\`\``);
-                }
-            } finally {
-                try {
-                    channel.send(mute_embed);
-                    logs.send(logs_embed);
-                } catch (err) {
-                    console.log(err);
-                }
-            }
+            
         }
 
         const perm_embed = new Discord.MessageEmbed()
