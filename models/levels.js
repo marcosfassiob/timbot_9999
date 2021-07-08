@@ -81,10 +81,9 @@ module.exports = (client) => {
     
 
     client.on('message', async message => {
-        const { guild, member, author, channel } = message;
+        const { guild, member, author, channel, content } = message;
         if (author.bot) return;
         if (channel.type === "dm") return;
-
         await mongoose.connect(process.env.MONGO_URI, {
             useNewUrlParser: true,
             useFindAndModify: false,
@@ -108,9 +107,12 @@ module.exports = (client) => {
                     onCooldown.add(author.id)
                     setTimeout(() => onCooldown.delete(author.id), 20 * 1000)
                 }
-                const result = await levelSchema.findOne({ guildId: guild.id, userId: author.id });
-                if (result === null) return;
-                const { level } = result;
+                const levelResult = await levelSchema.findOne({ guildId: guild.id, userId: author.id });
+                const prefixResult = await guildConfigSchema.findOne({ guildId: guild.id }, 'prefix');
+                const { level } = levelResult;
+                const { prefix } = prefixResult;
+                if (levelResult === null) return;
+                if (content.startsWith(prefix)) return; //please for my sanity fucking work
 
                 //FOR MY GUILD ONLY
                 if (guild.id === '778461267999588363') {
