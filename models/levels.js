@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const levelSchema = require('../schemas/level-schema')
+const guildConfigSchema = require('../schemas/guild-config-schema')
 
 //xp needed & add xp
 const getNeededXp = level => 4 * Math.pow(level, 2) + (45 * level) + 120 
