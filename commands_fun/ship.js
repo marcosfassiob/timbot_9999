@@ -106,7 +106,7 @@ module.exports = {
             } finally {
                 let shipRate = (parseInt(paramOne.rate) * parseInt(paramTwo.rate)).toString().replace(/0{3,}/g, "");
                 console.log(shipRate);
-                shipRate = parseInt(shipRate.substring(10, 12))
+                shipRate = parseInt(shipRate.substring(8, 10))
                 return [shipRate, paramOne, paramTwo];
             }           
         }
@@ -179,6 +179,8 @@ module.exports = {
 
             let emote;
             let footer;
+
+            if (shipRate === 99) shipRate = 100; //cause why not
 
             //emote magic fuck yeah
             switch (true) {

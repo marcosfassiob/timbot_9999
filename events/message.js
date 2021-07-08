@@ -65,6 +65,9 @@ module.exports = (client, Discord) => {
 
         //set up everything for commands
         const prefix = guildPrefixes[message.guild.id]
+        if (message.mentions.has(message.guild.me)) {
+            return message.channel.send(`my current prefix is \`${prefix}\` - type \`${prefix}help\` to start using the bot!`)
+        }
         if (!message.content.toLowerCase().startsWith(prefix)) return;
         
         const args = message.content.slice(prefix.length).trim().split(/ +/);

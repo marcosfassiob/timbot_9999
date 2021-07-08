@@ -69,7 +69,7 @@ module.exports = {
             .setTimestamp();
 
             try {
-                await target.send(`You've been kicked from **${guild.name}** for: **${reason}**`)
+                await target.send(`You've been kicked from **${guild.name}**\nReason: **${reason}**`)
             } catch (err) {
                 console.log(err);
                 if (err instanceof DiscordAPIError) {

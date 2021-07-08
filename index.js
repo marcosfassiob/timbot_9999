@@ -57,7 +57,7 @@ client.on('ready', async () => {
     voiceStateUpdate(client, Discord)
 
     //models
-    levels(client, Discord)
+    levels(client)
     perServerSettings(client)
     
     console.log("TimBot 9999 ACTIVATED");

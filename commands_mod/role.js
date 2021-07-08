@@ -59,7 +59,7 @@ module.exports = {
 
             try {
                 role = mentions.roles.first()
-                || guild.roles.cache.find(r => r.name.toLowerCase().startsWith(role))
+                || guild.roles.cache.find(r => r.name.toLowerCase().startsWith(args[1]))
                 || await guild.roles.fetch(role);
                 if (role == undefined || role.name  === '@everyone') throw new TypeError('Cannot read property');
             } catch (err) {
@@ -145,7 +145,7 @@ module.exports = {
 
             try {
                 role = mentions.roles.first()
-                || guild.roles.cache.find(r => r.name.toLowerCase().startsWith(role))
+                || guild.roles.cache.find(r => r.name.toLowerCase().startsWith(args[1]))
                 || await guild.roles.fetch(role);
                 if (role == undefined || role.name  === '@everyone') throw new TypeError('Cannot read property');
             } catch (err) {

@@ -16,7 +16,7 @@ module.exports = {
         'lb clear [@user] - clears the leaderboard [or a user\'s stats]',
         'lb edit <@user> <level> [xp] - edit a user\'s stats'
     ],
-    perms: "ADMINISTRATOR",
+    perms: "MANAGE_GUILD",
     async execute(client, message, args, Discord) {
         const { member, guild, mentions, channel, author } = message;
 

@@ -15,25 +15,38 @@ module.exports = {
     desc: 'Displays the user\'s profile picture',
     execute(client, message, args, Discord) {
 
-        const guildMember = message.mentions.members.first() 
-        || message.guild.members.cache.get(args[0]) 
-        || message.member
+        const { mentions, guild, member, channel } = message;
+        const target = mentions.members.first() || guild.members.cache.get(args[0]) || member
 
-        let url = guildMember.user.displayAvatarURL({ dynamic: true, size: 512, format: 'png' });
-        let showGuild = false
+        /**
+         * Displays user avatar URL
+         * @param {Snowflake} target 
+         * @param {i have no idea lol} url 
+         */
+        function show_avatar(target, url) {
+            const embed = new Discord.MessageEmbed()
+            .setColor('E87722')
+            .setTitle(`${target.user.tag}'s avatar:`)
+            .setImage(url)
+            channel.send(embed).catch(err => console.log(err));
+        }
+
+        /**
+         * Displays guild server icon
+         * @param {i have no idea lol} url 
+         */
+        function show_server_icon(url) {
+            const embed = new Discord.MessageEmbed()
+            .setColor('E87722')
+            .setTitle(`${guild.name}'s server icon:`)
+            .setImage(url)
+            channel.send(embed).catch(err => console.log(err));
+        }
 
         if (args[0] === 'guild') {
-            showGuild = true
-            url = message.guild.iconURL({ dynamic: true, size: 512 })
+            show_server_icon(guild.iconURL({ dynamic: true, size: 512 }))
+        } else {
+            show_avatar(target, target.user.avatarURL({ dynamic: true, size: 512 }))
         }
-        if (args[1]) guildMember = null;
-
-        const embed = new Discord.MessageEmbed()
-        .setColor("#E87722")
-        .setTitle(`${(showGuild) ? message.guild.name : guildMember.user.tag}'s ${(showGuild) ? 'server icon' : 'avatar'}:`)
-        .setImage(url)
-
-        message.channel.send(embed)
-            .catch(e => console.log(e.stack))
     }
 }

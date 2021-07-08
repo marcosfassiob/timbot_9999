@@ -16,9 +16,10 @@ module.exports = {
     perms: ["None"],
     execute(client, message, args, Discord) {
 
-        const guildMember = message.mentions.members.first() || message.guild.members.cache.get(args[0]) || message.member
-        const perms = guildMember.permissions.toArray().join(', ')  
-        let ack = [];
+        const { mentions, guild, channel, member } = message;
+        const target = mentions.members.first() || guild.members.cache.get(args[0]) || member
+        const perms = target.permissions.toArray().join(', ')  
+        let acknowledgements = [];
 
         let hasManager = false
         let hasMod = false
@@ -38,26 +39,25 @@ module.exports = {
             'DEAFEN_MEMBERS',
         ]
 
-        guildMember.permissions.toArray().forEach(r => {
-            if (manager_roles.includes(r)) hasManager = true
-            if (mod_roles.includes(r)) hasMod = true
-            if (r === 'ADMINISTRATOR') ack.push("Server administrator")
+        target.permissions.toArray().forEach(role => {
+            if (manager_roles.includes(role)) hasManager = true;
+            if (mod_roles.includes(role)) hasMod = true;
+            if (role === 'ADMINISTRATOR') acknowledgements.push("Server administrator");
         })
 
-        if (hasMod) ack.push("Server moderator")
-        if (hasManager) ack.push("Server manager")
-        if (!hasMod && !hasManager) ack.push("None")
+        if (hasMod) acknowledgements.push("Server moderator")
+        if (hasManager) acknowledgements.push("Server manager")
+        if (!hasMod && !hasManager) acknowledgements.push("None")
 
         const embed = new Discord.MessageEmbed()
         .setColor("#E87722")
-        .setThumbnail(guildMember.user.displayAvatarURL({ dynamic: true }))
-        .setTitle(`List of permissions for ${guildMember.user.tag}`)
+        .setThumbnail(target.user.displayAvatarURL({ dynamic: true }))
+        .setTitle(`List of permissions for ${target.user.tag}`)
         .addFields(
             { name : "Perms:", value: "```\n" + perms + "```", inline: true },
-            { name: "Acknowledgements:", value: ack }
+            { name: "Acknowledgements:", value: acknowledgements }
         )
 
-        message.channel.send(embed)
-            .catch(console.error)
+        channel.send(embed).catch(err => console.log(err));
     }
 }

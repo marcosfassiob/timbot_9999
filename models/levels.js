@@ -16,26 +16,23 @@ const addXP = async (guildId, userId, xpToAdd, message) => {
                 { upsert: true, new: true })
 
             let { xp, level } = result;
-            const { member, guild } = message;
+            const { member, guild, channel } = message;
             const needed = getNeededXp(level);
             console.log(`guild: ${guild.name}, user: ${member.user.tag}, level: ${level}, xp: ${xp}`);
 
             if (xp >= needed) {
                 ++level
                 xp -= needed
-                member.send({ embed: {
+                channel.send(`${member.user}, you've ranked up!`,{ embed: {
                         author: {
-                            name: `You've ranked up in ${guild.name}!`,
+                            name: `${member.user.tag}, congrats on ranking up!`,
                         },
                         title: `New level: ${level}`,
                         color: `#003C71`,
                         description: `XP needed: ${needed} xp`,
                         thumbnail: {
-                            url: guild.iconURL({ dynamic: true })
+                            url: member.user.avatarURL({ dynamic: true })
                         },
-                        footer: {
-                            text: `if you want to stop receiving these, block me.`
-                        }
                     }
                 })
             }
@@ -52,36 +49,36 @@ const addXP = async (guildId, userId, xpToAdd, message) => {
 }  
 
 const onCooldown = new Set();
-const onCooldownVoice = new Set();
+//const onCooldownVoice = new Set();
 module.exports.addXP = addXP;
 
 module.exports = (client) => {
 
-    /* commenting this out for now cause this shits hard lol
-    client.on('voiceStateUpdate', async (oldState, newState) => {
-        const { guild, member } = oldState;
-        if (member.user.bot) return;
-        if (newState.member.voice.channel) {
-            await mongoose.connect(process.env.MONGO_URI, {
-                useNewUrlParser: true,
-                useFindAndModify: false,
-                useUnifiedTopology: true
-            }).then(() => {
-                try {
-                    if (!onCooldownVoice.has(member.id)) {
-                        setInterval(() => {
-                            addXP(guild.id, member.id, 5, oldState);
-                            onCooldownVoice.add(member.id);
-                            setTimeout(() => { onCooldownVoice.delete(member.id) }, 60 * 1000)
-                        }, 60 * 1000) //10 minutes
-                    }
-                } catch (err) {
-                    console.log(err)
-                }
-            })
-        }
-    })
-    */
+    // commenting this out for now cause this shits hard lol
+    // client.on('voiceStateUpdate', async (oldState, newState) => {
+    //     const { guild, member } = oldState;
+    //     if (member.user.bot) return;
+    //     if (newState.member.voice.channel) {
+    //         await mongoose.connect(process.env.MONGO_URI, {
+    //             useNewUrlParser: true,
+    //             useFindAndModify: false,
+    //             useUnifiedTopology: true
+    //         }).then(() => {
+    //             try {
+    //                 if (!onCooldownVoice.has(member.id)) {
+    //                     setInterval(() => {
+    //                         addXP(guild.id, member.id, 5, oldState);
+    //                         onCooldownVoice.add(member.id);
+    //                         setTimeout(() => { onCooldownVoice.delete(member.id) }, 60 * 1000)
+    //                     }, 60 * 1000) //10 minutes
+    //                 }
+    //             } catch (err) {
+    //                 console.log(err)
+    //             }
+    //         })
+    //     }
+    // })
+    
 
     client.on('message', async message => {
         const { guild, member, author, channel } = message;

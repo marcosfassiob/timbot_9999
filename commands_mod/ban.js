@@ -69,7 +69,7 @@ module.exports = {
             .setTitle(`Banned ${target.tag}`);
 
             try {
-                if (guild.member(target)) await target.send(`You've been banned from **${guild.name}** for: **${reason}**`);
+                if (guild.member(target)) await target.send(`You've been banned from **${guild.name}**\nReason: **${reason}**`);
             } catch (err) {
                 console.log(err);
                 if (err instanceof DiscordAPIError) {

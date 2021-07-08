@@ -24,6 +24,9 @@ module.exports = {
         const result = await guildConfigSchema.findOne({ guildId: message.guild.id }, 'prefix');
         const { prefix } = result;
 
+        /**
+         * Displays the help command.
+         */
         function help() {
             const embed1 = new Discord.MessageEmbed()
             .setColor("#E87722")
@@ -44,6 +47,9 @@ module.exports = {
             message.channel.send(embed1)
         }
 
+        /**
+         * Displays the command details for the specified command. "help ban"
+         */
         function helpPrompt() {
             const cmd = client.commands.get(message.content.slice(prefix.length).toLowerCase())
             || client.commands.get(args[0])
@@ -83,12 +89,16 @@ module.exports = {
             )
 
             try {
-                aliases = aliases.join(', ');
+                var newAliases = [];
+                aliases.forEach(alias => {
+                    newAliases.push(`\`${alias}\``);
+                })
+                newAliases = newAliases.join(', ');
             } catch (err) {
                 console.log(err)
             } finally {
-                embed5.setDescription(`**Required permissions: **\`${perms}\`\n**Aliases: **\`${aliases}\``);
-                message.channel.send(embed5)
+                embed5.setDescription(`**Required permissions: **\`${perms}\`\n**Aliases: **${newAliases}`);
+                message.channel.send(embed5).catch(err => console.log(err));
             }
         }
         
