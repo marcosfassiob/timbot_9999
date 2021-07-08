@@ -18,7 +18,7 @@ module.exports = {
 
         guild.fetchInvites().then(invites => {
             try {
-                invites = invites.array().filter(invite => invite.uses > 0).sort((inviteA, inviteB) => { return inviteB.uses - inviteA.uses });
+                invites = invites.array().filter(invite => invite.uses > 0 && !invite.inviter.bot).sort((inviteA, inviteB) => { return inviteB.uses - inviteA.uses });
                 for (let i = 0; i < 5; i++) {
                     embed.addField(`${i + 1}.) ${invites[i].inviter.tag}`, `Code: \`${invites[i].code}\`\nMembers invited: **${invites[i].uses}**`)
                 }
