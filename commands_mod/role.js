@@ -59,7 +59,7 @@ module.exports = {
 
             try {
                 role = mentions.roles.first()
-                || guild.roles.cache.find(r => r.name.toLowerCase().startsWith(args[1]))
+                || guild.roles.cache.find(r => r.name.toLowerCase().startsWith(args.slice(2).join(' ')))
                 || await guild.roles.fetch(role);
                 if (role == undefined || role.name  === '@everyone') throw new TypeError('Cannot read property');
             } catch (err) {
@@ -145,7 +145,7 @@ module.exports = {
 
             try {
                 role = mentions.roles.first()
-                || guild.roles.cache.find(r => r.name.toLowerCase().startsWith(args[1]))
+                || guild.roles.cache.find(r => r.name.toLowerCase().startsWith(args.slice(2).join(' ')))
                 || await guild.roles.fetch(role);
                 if (role == undefined || role.name  === '@everyone') throw new TypeError('Cannot read property');
             } catch (err) {
@@ -315,9 +315,9 @@ module.exports = {
         }
         
         if (args[0] === 'add') {
-            add_role(args[1], args[2]);
+            add_role(args[1], args.slice(2).join(' '));
         } else if (args[0] === 'remove') {
-            remove_role(args[1], args[2]);
+            remove_role(args[1], args.slice(2).join(' '));
         } else if (args[0] === 'create') {
             create_role(args.slice(1).join(' '), args.pop().toUpperCase() || "DEFAULT");
         } else if (args[0] === 'delete') {
