@@ -65,12 +65,12 @@ module.exports = {
             .setDescription(`**Amount: ** ${amount}\n **Channel: ** ${channel}`)
             .setTimestamp();
             
-            try {
-                channel.send(purge_embed).then(msg => setTimeout(() => { msg.delete }, 5000));
-                logs.send(logs_embed);
-            } catch (err) {
+            channel.send(purge_embed).then(msg => {
+                setTimeout(() => { msg.delete() }, 5000)
+                logs.send(logs_embed).catch(err => console.log(err))
+            }, err => {
                 console.log(err);
-            }
+            })
         }
 
         /**
@@ -123,12 +123,12 @@ module.exports = {
                 await channel.messages.fetch({ limit: 100 }).then(async (amnt) => {
                     amnt = amnt.filter(message => message.author.id === target.user.id).array().slice(0, amount);
                     await channel.bulkDelete(amnt).then(() => {
-                        try {
-                            channel.send(purge_embed).then(m => { setTimeout(() => m.delete(), 5000) })
-                            logs.send(logs_embed);
-                        } catch (err) {
+                        channel.send(purge_embed).then(msg => {
+                            setTimeout(() => { msg.delete() }, 5000)
+                            logs.send(logs_embed).catch(err => console.log(err))
+                        }, err => {
                             console.log(err);
-                        }
+                        })
                     }, err => {
                         console.log(err)
                         error_embed.setTitle(`I couldn't purge any messages.`)

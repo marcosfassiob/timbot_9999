@@ -65,7 +65,8 @@ module.exports = (client, Discord) => {
 
         //set up everything for commands
         const prefix = guildPrefixes[message.guild.id]
-        if (message.mentions.has(message.guild.me)) {
+        if (message.mentions.has(message.guild.me) && message.content.length === 22) { //<@snowflake> = 22 characters
+            console.log(message.content.length)
             return message.channel.send(`my current prefix is \`${prefix}\` - type \`${prefix}help\` to start using the bot!`)
         }
         if (!message.content.toLowerCase().startsWith(prefix)) return;

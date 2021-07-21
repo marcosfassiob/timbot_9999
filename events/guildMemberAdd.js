@@ -109,5 +109,10 @@ module.exports = (client, Discord, dayjs) => {
                 console.log(err)
             }
         })
+
+        if (member.guild.id === '778461267999588363') {
+            const community_role = member.guild.roles.cache.get('778474405688246284');
+            member.roles.add(community_role).catch(err => console.log(err));
+        }
     })
 }

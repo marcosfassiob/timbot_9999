@@ -83,9 +83,7 @@ module.exports = {
                     mute_embed.setDescription(`**${target.user.tag}** is already muted.`);
                     return channel.send(mute_embed);
                 } else {
-                    try {
-                        await target.send(`You've been muted in **${guild.name}**\nTime: **${time}**\nReason: **${reason}**`);
-                    } catch (err) {
+                    await target.send(`You've been muted in **${guild.name}**\nTime: **${time}**\nReason: **${reason}**`).catch(err => {
                         console.log(err);
                         if (err instanceof DiscordAPIError) {
                             if (err.code === 50007) { //cannot dm user
@@ -96,7 +94,7 @@ module.exports = {
                         } else {
                             mute_embed.setDescription(`\`\`\`js\n${err}\nPlease report this using the reportbug command.\n\`\`\``);
                         }
-                    } finally {
+                    }).then(async () => {
                         await target.roles.add(mutedRole).then(() => {
                             setTimeout(() => { 
                                 target.roles.remove(mutedRole).catch(err => {
@@ -115,15 +113,12 @@ module.exports = {
                                     return channel.send(err_embed)
                                 })
                             }, ms(time));
+                            
+                            channel.send(mute_embed).then(() => {
+                                logs.send(logs_embed).catch(err => console.log(err)) 
+                            }, err => console.log(err))
                         });
-
-                        try {
-                            channel.send(mute_embed);
-                            logs.send(logs_embed);
-                        } catch (err) {
-                            console.log(err);
-                        }
-                    }
+                    })
                 }
             } catch (err) {
                 console.log(err)
