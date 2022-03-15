@@ -1,5 +1,7 @@
 ﻿# TimBot_9999
-**As of November 15, 2021, this bot has been offline, and I have ceased development since then. It was a really fun bot to work on and I learned a lot of technical skills from this.** A general-purpose bot with several of its own little gimmicks. What started as a passion project early February has become what it is today: a fully-fledged bot with moderation, configurability, logging and other fun commands.
+**As of November 15, 2021, this bot has been offline, and I have ceased development since then. It was a really fun bot to work on and I learned a lot of technical skills from this.** 
+
+A general-purpose bot with several of its own little gimmicks. What started as a passion project early February has become what it is today: a fully-fledged bot with moderation, configurability, logging and other fun commands.
 
 [Add TimBot 9999 to your server!](https://discord.com/oauth2/authorize?client_id=807464203358830605&scope=bot&permissions=8)
 
